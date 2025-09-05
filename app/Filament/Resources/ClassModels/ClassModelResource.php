@@ -35,6 +35,11 @@ class ClassModelResource extends Resource
         return ClassModelForm::configure($schema);
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Pembelajaran';
+    }
+
     public static function table(Table $table): Table
     {
         return ClassModelsTable::configure($table);

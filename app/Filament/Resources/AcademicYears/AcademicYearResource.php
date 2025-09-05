@@ -22,10 +22,16 @@ class AcademicYearResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static ?string $pluralModelLabel = 'Daftar Tahun Ajaran';
     protected static ?string $navigationLabel = 'Tahun Ajaran';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
         return AcademicYearForm::configure($schema);
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Pembelajaran';
     }
 
     public static function table(Table $table): Table
