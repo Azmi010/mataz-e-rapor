@@ -23,8 +23,9 @@ class StudentsRelationManager extends RelationManager
                 Forms\Components\Select::make('user_id')
                     ->label('Pilih Siswa')
                     ->relationship('user', 'name', fn($query) => $query->where('role', 'student'))
-                    ->getOptionLabelFromRecordUsing(fn($record) => $record->profile?->full_name ?? $record->name)
+                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->name} ({$record->email})")
                     ->required()
+                    ->preload()
                     ->searchable(),
                 Forms\Components\TextInput::make('nis')
                     ->label('NIS')
@@ -71,13 +72,14 @@ class StudentsRelationManager extends RelationManager
                     ->label('Tambah Siswa'),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->label('Edit'),
+                DeleteAction::make()
+                    ->label('Hapus'),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ])
+                DeleteBulkAction::make()
+                    ->label('Hapus Terpilih'),
             ]);
     }
 }
