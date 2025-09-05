@@ -1,0 +1,150 @@
+Project Brief: Migrasi dan Pembangunan Aplikasi "MATAZ" ke Laravel Filament
+1. Tujuan Utama Proyek
+
+Migrasi aplikasi manajemen sekolah "MATAZ" dari stack React/Supabase ke Laravel 12 dengan Filament 3 sebagai engine utama untuk semua antarmuka pengguna (UI). Aplikasi ini akan memiliki tiga portal terpisah berdasarkan peran pengguna: Admin, Guru (Teacher), dan Siswa (Student), dengan database menggunakan MySQL.
+
+2. Arsitektur & Teknologi
+
+Backend: Laravel 12
+
+Frontend/UI Panel: Filament 3 (Blade & Livewire)
+
+Database: MySQL
+
+Autentikasi: Laravel Breeze untuk halaman login/registrasi publik, dengan redirect otomatis ke panel Filament yang sesuai setelah login.
+
+3. Alur Autentikasi & Otorisasi
+
+Gunakan Laravel Breeze untuk menyediakan satu halaman login (/login) yang terpadu.
+
+Nonaktifkan halaman login bawaan Filament (/admin/login, /teacher/login, dll.).
+
+Setelah login berhasil, arahkan pengguna secara otomatis berdasarkan kolom role di tabel users:
+
+admin → /admin
+
+teacher → /teacher
+
+student → /student
+
+Buat 3 Panel Filament terpisah: admin, teacher, dan student.
+
+Setiap panel harus dilindungi oleh middleware yang memastikan hanya peran yang sesuai yang dapat mengaksesnya (misal: middleware IsAdmin untuk panel /admin).
+
+4. Skema Database & Model Eloquent
+
+Buatkan migrations dan models dengan relasi Eloquent yang sesuai untuk tabel-tabel berikut:
+
+users: Bawaan Laravel, tambahkan kolom role ENUM('admin', 'teacher', 'student').
+
+profiles: One-to-One dengan users. Berisi full_name, username, phone, address.
+
+academic_years: HasMany semesters. Berisi name, start_date, end_date, status (boolean).
+
+semesters: BelongsTo academic_years. Berisi semester_type, start_date, end_date.
+
+subjects: ManyToMany dengan class_models. Berisi name, has_details (boolean).
+
+class_models: BelongsTo academic_years, ManyToMany subjects. Berisi name.
+
+class_subjects: Tabel pivot untuk class_models dan subjects.
+
+teachers: One-to-One dengan users. Berisi nip.
+
+students: One-to-One dengan users, BelongsTo class_models. Berisi nis, wali.
+
+activities: Tabel data master poin aktivitas. Berisi name, activity_type ('Sekolah' atau 'Rumah').
+
+daily_activities: BelongsTo students, activities, semesters. Berisi activity_date.
+
+attendances: BelongsTo students, semesters. Berisi date, status ('Hadir', 'Sakit', 'Izin', 'Alpha'). Primary key gabungan pada (student_id, date).
+
+report_cards: BelongsTo students, semesters. Berisi teacher_comment, attendance (JSONB).
+
+report_card_grades: BelongsTo report_cards, subjects. Berisi grade, description.
+
+5. Fitur Panel Admin (/admin)
+
+Buat Filament Resources untuk fungsionalitas CRUD penuh pada semua entitas di atas, dengan detail sebagai berikut:
+
+AcademicYearResource:
+
+Form: TextInput untuk nama, DatePicker untuk tanggal, Toggle untuk status.
+
+Sertakan RelationManager untuk semesters.
+
+ClassModelResource:
+
+Form: Select berelasi untuk academic_year, CheckboxList berelasi untuk subjects (relasi Many-to-Many).
+
+StudentResource & TeacherResource:
+
+Form: Select berelasi ke users untuk memilih pengguna.
+
+Fitur CRUD standar lainnya untuk Activity dan Subject.
+
+6. Fitur Portal Guru (/teacher)
+
+Buat Filament Pages berikut di dalam panel teacher:
+
+TeacherDashboard: Halaman dashboard awal (bisa statis untuk saat ini).
+
+DailyActivityChecklist:
+
+Memiliki filter dropdown untuk memilih Kelas dan DatePicker untuk memilih Tanggal.
+
+Menampilkan matriks tabel: daftar siswa di baris, dan daftar poin aktivitas di kolom.
+
+Setiap sel berisi checkbox untuk menandai aktivitas harian siswa.
+
+Di bawahnya, tampilkan matriks tabel kedua untuk kehadiran dengan radio button (Hadir, Sakit, Izin, Alpha) untuk setiap siswa.
+
+Setiap interaksi (check/uncheck) harus menyimpan data secara real-time (logika Livewire).
+
+GradeManagement:
+
+Halaman pemilihan dengan filter dropdown untuk Semester dan Kelas.
+
+Setelah kelas dipilih, tampilkan daftar siswa di kelas tersebut.
+
+Setiap siswa memiliki tombol "Isi Nilai" yang mengarah ke halaman GradingForm.
+
+GradingForm (sebagai halaman terpisah):
+
+Menerima studentId, semesterId, classId dari URL.
+
+Menampilkan rekapitulasi kehadiran siswa.
+
+Menampilkan daftar mata pelajaran (juz) dan detailnya (surat) dalam bentuk form input nilai.
+
+Menyediakan textarea untuk komentar wali kelas.
+
+Memiliki satu tombol "Simpan Semua" yang menyimpan semua nilai dan detail rapor dalam satu transaksi.
+
+7. Fitur Portal Siswa (/student)
+
+Buat Filament Pages berikut di dalam panel student:
+
+StudentDashboard:
+
+Tampilkan statistik dinamis untuk siswa yang login: Total Poin Aktivitas dan Rata-rata Nilai untuk semester aktif.
+
+Tampilkan daftar Pengumuman terbaru.
+
+Gunakan Database Function (RPC) get_student_dashboard_data untuk mengambil semua data ini dalam satu panggilan.
+
+MyReport:
+
+Sediakan filter dropdown untuk memilih Tahun Ajaran dan Semester.
+
+Setelah dipilih, tampilkan dokumen rapor (PDF-like view) di bawahnya. Gunakan kembali komponen ReportDocument yang sudah dirancang.
+
+8. Implementasi Logika Bisnis (Pengganti RPC)
+
+Logika transaksional yang sebelumnya dibuat di PostgreSQL RPC harus diimplementasikan di dalam Laravel menggunakan DB::transaction() pada metode yang relevan di Filament Resource Actions atau Service Class. Contoh utama:
+
+ClassModelResource: Saat membuat/mengubah Kelas, operasi insert/update ke tabel classes dan sinkronisasi relasi di tabel class_subjects harus berada dalam satu transaksi. Gunakan method ->afterStateUpdated() atau ->using() pada Actions.
+
+AcademicYearResource: Sama seperti di atas, operasi ke tabel academic_years dan semesters harus transaksional.
+
+GradingForm: Tombol "Simpan Semua" harus memicu satu transaksi yang menyimpan data ke report_cards dan report_card_grades.
