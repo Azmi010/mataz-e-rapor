@@ -26,13 +26,24 @@ class SemestersRelationManager extends RelationManager
                         1 => 'Semester 1 (Ganjil)',
                         2 => 'Semester 2 (Genap)',
                     ])
-                    ->required(),
+                    ->required()
+                    ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule) {
+                        return $rule->where('academic_year_id', $this->ownerRecord->id);
+                    }),
                 Forms\Components\DatePicker::make('start_date')
                     ->label('Tanggal Mulai')
-                    ->required(),
+                    ->required()
+                    ->minDate(fn() => $this->ownerRecord->start_date)
+                    ->maxDate(fn() => $this->ownerRecord->end_date)
+                    ->before('end_date')
+                    ->helperText('Tanggal harus berada dalam rentang tahun ajaran'),
                 Forms\Components\DatePicker::make('end_date')
                     ->label('Tanggal Selesai')
-                    ->required(),
+                    ->required()
+                    ->minDate(fn() => $this->ownerRecord->start_date)
+                    ->maxDate(fn() => $this->ownerRecord->end_date)
+                    ->after('start_date')
+                    ->helperText('Tanggal harus berada dalam rentang tahun ajaran'),
             ]);
     }
 
@@ -43,26 +54,33 @@ class SemestersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('semester_type')
                     ->label('Semester')
-                    ->formatStateUsing(fn(string $state): string => "Semester {$state}"),
+                    ->formatStateUsing(fn(string $state): string => "Semester {$state}")
+                    ->badge()
+                    ->color(fn(string $state): string => $state == '1' ? 'info' : 'success'),
                 Tables\Columns\TextColumn::make('start_date')
+                    ->label('Tanggal Mulai')
                     ->date('d M Y'),
                 Tables\Columns\TextColumn::make('end_date')
+                    ->label('Tanggal Selesai')
                     ->date('d M Y'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Tambah Semester'),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->label('Edit'),
+                DeleteAction::make()
+                    ->label('Hapus'),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ])
+                DeleteBulkAction::make()
+                    ->label('Hapus Terpilih'),
+
             ]);
     }
 }

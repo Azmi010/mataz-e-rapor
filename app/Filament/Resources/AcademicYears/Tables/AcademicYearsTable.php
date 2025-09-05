@@ -16,21 +16,30 @@ class AcademicYearsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Nama Tahun Ajaran')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('start_date')
-                    ->date()
+                    ->label('Tanggal Mulai')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->date()
+                    ->label('Tanggal Selesai')
+                    ->date('d M Y')
                     ->sortable(),
-                IconColumn::make('status')
-                    ->boolean(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn(bool $state): string => $state ? 'Aktif' : 'Tidak Aktif')
+                    ->color(fn(bool $state): string => $state ? 'success' : 'gray'),
+                TextColumn::make('semesters_count')
+                    ->label('Jumlah Semester')
+                    ->counts('semesters')
+                    ->badge()
+                    ->color('info'),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -38,12 +47,12 @@ class AcademicYearsTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->label('Edit'),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                DeleteBulkAction::make()
+                    ->label('Hapus Terpilih'),
             ]);
     }
 }
