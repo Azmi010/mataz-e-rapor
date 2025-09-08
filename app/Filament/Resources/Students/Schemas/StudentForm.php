@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Students\Schemas;
 
+use App\Models\Student;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -14,7 +15,17 @@ class StudentForm
             ->components([
                 Select::make('user_id')
                     ->label('Pilih User')
-                    ->relationship('user', 'name', fn($query) => $query->where('role', 'student'))
+                    ->relationship('user', 'name', function($query, $livewire) {
+                        $query->where('role', 'student');
+
+                        $excludeUserIds = Student::pluck('user_id');
+
+                        if ($livewire->record) {
+                            $excludeUserIds = $excludeUserIds->reject(fn($id) => $id == $livewire->record->user_id);
+                        }
+
+                        $query->whereNotIn('id', $excludeUserIds);
+                    })
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->name} ({$record->email})")
                     ->required()
                     ->searchable()
