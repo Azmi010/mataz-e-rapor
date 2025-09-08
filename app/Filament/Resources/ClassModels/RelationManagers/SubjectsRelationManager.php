@@ -43,8 +43,8 @@ class SubjectsRelationManager extends RelationManager
                 TextColumn::make('has_details')
                     ->label('Memiliki Detail')
                     ->badge()
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Ya' : 'Tidak')
-                    ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
+                    ->formatStateUsing(fn(bool $state): string => $state ? 'Ya' : 'Tidak')
+                    ->color(fn(bool $state): string => $state ? 'success' : 'gray'),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->date('d M Y')
@@ -58,17 +58,16 @@ class SubjectsRelationManager extends RelationManager
                 AttachAction::make()
                     ->label('Tambah Mata Pelajaran')
                     ->preloadRecordSelect(),
-                CreateAction::make()
-                    ->label('Buat Mata Pelajaran Baru'),
             ])
             ->actions([
-                EditAction::make(),
-                DetachAction::make(),
+                EditAction::make()
+                    ->label('Edit'),
+                DetachAction::make()
+                    ->label('Hapus'),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DetachBulkAction::make(),
-                ])
+                DetachBulkAction::make()
+                    ->label('Hapus Terpilih'),
             ]);
     }
 }

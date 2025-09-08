@@ -26,11 +26,16 @@ class TeacherResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
         return TeacherForm::configure($schema);
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Civitas Akademik';
     }
 
     public static function table(Table $table): Table

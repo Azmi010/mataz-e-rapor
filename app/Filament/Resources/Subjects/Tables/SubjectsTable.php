@@ -19,6 +19,12 @@ class SubjectsTable
                     ->label('Nama Mata Pelajaran')
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('description')
+                    ->label('Deskripsi')
+                    ->limit(50)
+                    ->toggleable(),
+
                 IconColumn::make('has_details')
                     ->label('Memiliki Detail')
                     ->boolean()
@@ -26,11 +32,27 @@ class SubjectsTable
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('gray'),
-                TextColumn::make('classModels_count')
-                    ->label('Digunakan di Kelas')
-                    ->counts('classModels')
+
+                TextColumn::make('details_count')
+                    ->label('Jumlah Detail')
+                    ->counts('details')
                     ->badge()
-                    ->color('info'),
+                    ->color('info')
+                    ->visible(fn($record) => $record?->has_details),
+
+                TextColumn::make('classModels')
+                    ->label('Digunakan di Kelas')
+                    ->formatStateUsing(function ($record) {
+                        $classes = $record->classModels;
+                        if ($classes->isEmpty()) {
+                            return 'Belum digunakan';
+                        }
+                        return $classes->pluck('name')->join(', ');
+                    })
+                    ->wrap()
+                    ->badge()
+                    ->color(fn($record) => $record->classModels->isEmpty() ? 'gray' : 'success'),
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
@@ -45,7 +67,8 @@ class SubjectsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Hapus Terpilih'),
                 ]),
             ]);
     }

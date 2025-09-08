@@ -26,11 +26,16 @@ class StudentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
         return StudentForm::configure($schema);
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Civitas Akademik';
     }
 
     public static function table(Table $table): Table

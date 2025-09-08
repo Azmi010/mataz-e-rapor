@@ -26,11 +26,16 @@ class ActivityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
         return ActivityForm::configure($schema);
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Pembelajaran';
     }
 
     public static function table(Table $table): Table

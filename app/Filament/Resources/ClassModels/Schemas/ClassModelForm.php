@@ -19,9 +19,10 @@ class ClassModelForm
                     ->placeholder('Contoh: XII IPA 1'),
                 Select::make('academic_year_id')
                     ->label('Tahun Akademik')
-                    ->relationship('academicYear', 'name')
+                    ->relationship('academicYear', 'name', fn($query) => $query->where('status', true))
                     ->required()
-                    ->searchable(),
+                    ->preload()
+                    ->helperText('Hanya tahun akademik yang aktif yang bisa dipilih'),
                 Select::make('subjects')
                     ->label('Mata Pelajaran')
                     ->relationship('subjects', 'name')
