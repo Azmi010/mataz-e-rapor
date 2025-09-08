@@ -27,11 +27,6 @@ class ActivitiesTable
                         'Rumah' => 'info',
                         default => 'gray',
                     }),
-                TextColumn::make('dailyActivities_count')
-                    ->label('Total Pencatatan')
-                    ->counts('dailyActivities')
-                    ->badge()
-                    ->color('warning'),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
