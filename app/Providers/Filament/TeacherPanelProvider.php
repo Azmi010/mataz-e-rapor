@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Teacher\Pages\DailyActivityChecklist;
+use App\Filament\Teacher\Pages\GradeManagement;
+use App\Filament\Teacher\Resources\DailyActivities\DailyActivityResource;
 use App\Http\Middleware\RoleRedirectMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -32,9 +35,10 @@ class TeacherPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Teacher/Resources'), for: 'App\Filament\Teacher\Resources')
-            ->discoverPages(in: app_path('Filament/Teacher/Pages'), for: 'App\Filament\Teacher\Pages')
             ->pages([
                 Dashboard::class,
+                GradeManagement::class,
+                // GradingForm::class - Tidak didaftarkan karena butuh parameter
             ])
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\Filament\Teacher\Widgets')
             ->widgets([
