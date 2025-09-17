@@ -90,9 +90,17 @@ class FillGrades extends Page implements Forms\Contracts\HasForms
             }
         }
 
+        $currentDate = now()->format('Y-m-d');
         $semester = \App\Models\Semester::whereHas('academicYear', fn($q) => $q->where('status', true))
-            ->orderByDesc('start_date')
+            ->whereDate('start_date', '<=', $currentDate)
+            ->whereDate('end_date', '>=', $currentDate)
             ->first();
+
+        if (!$semester) {
+            $semester = \App\Models\Semester::whereHas('academicYear', fn($q) => $q->where('status', true))
+                ->orderBy('semester_type', 'asc')
+                ->first();
+        }
 
         $reportCard = null;
         $existingGrades = collect();
@@ -160,9 +168,19 @@ class FillGrades extends Page implements Forms\Contracts\HasForms
     public function submit(): void
     {
         $student = $this->record;
+
+        $currentDate = now()->format('Y-m-d');
         $semester = \App\Models\Semester::whereHas('academicYear', fn($q) => $q->where('status', true))
-            ->orderByDesc('start_date')
+            ->whereDate('start_date', '<=', $currentDate)
+            ->whereDate('end_date', '>=', $currentDate)
             ->first();
+
+        if (!$semester) {
+            $semester = \App\Models\Semester::whereHas('academicYear', fn($q) => $q->where('status', true))
+                ->orderBy('semester_type', 'asc')
+                ->first();
+        }
+
         if (!$semester) {
             Notification::make()->title('Semester aktif tidak ditemukan')->danger()->send();
             return;

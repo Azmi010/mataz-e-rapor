@@ -53,11 +53,12 @@ class GradingResource extends Resource
                 Action::make('fillGrades')
                     ->label('Isi Nilai')
                     ->icon('heroicon-o-pencil-square')
+                    ->color('primary')
                     ->url(fn($record) => Pages\FillGrades::getUrl(['record' => $record->getKey()])),
                 Action::make('previewReport')
                     ->label('Lihat Rapor')
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
+                    ->icon('heroicon-o-document-text')
+                    ->color('success')
                     ->url(fn($record) => Pages\PreviewReport::getUrl(['record' => $record->getKey()])),
             ])
             ->paginated([10, 25, 50])

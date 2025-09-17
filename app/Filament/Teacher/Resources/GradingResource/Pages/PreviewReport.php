@@ -9,7 +9,7 @@ use App\Models\Student;
 class PreviewReport extends Page
 {
     protected static string $resource = GradingResource::class;
-    protected string $view = 'filament.teacher.pages.preview-report';
+    protected string $view = 'filament.teacher.grading.preview-report';
 
     public Student $record;
 
@@ -19,6 +19,11 @@ class PreviewReport extends Page
     }
 
     public function getHeading(): string
+    {
+        return 'Preview Rapor - ' . ($this->record->user->name ?? 'Siswa');
+    }
+
+    public function getTitle(): string
     {
         return 'Preview Rapor - ' . ($this->record->user->name ?? 'Siswa');
     }
