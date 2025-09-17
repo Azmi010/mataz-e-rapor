@@ -13,6 +13,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Actions\Action;
 use App\Models\ClassModel;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 
 class GradingResource extends Resource
@@ -23,6 +25,8 @@ class GradingResource extends Resource
     protected static ?string $pluralLabel = 'Manajemen Nilai';
     protected static ?string $slug = 'grading';
     protected static ?int $navigationSort = 5;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentDuplicate;
 
     public static function table(Table $table): Table
     {

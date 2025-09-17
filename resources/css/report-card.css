@@ -1,5 +1,5 @@
 /* Report Card Styles */
-.report-card {
+/* .report-card {
     font-family: 'Times New Roman', serif;
     font-size: 14px;
     line-height: 1.4;
@@ -66,10 +66,10 @@
     border-bottom: 1px solid #000;
     width: 120px;
     margin: 0 auto 8px;
-}
+} */
 
 /* Print Styles */
-@media print {
+/* @media print {
     @page {
         margin: 1.5cm;
         size: A4;
@@ -117,10 +117,10 @@
     .report-card .signatures-section {
         margin-top: 30px;
         page-break-inside: avoid;
-    }
+    } */
 
     /* Ensure borders are visible in print */
-    .report-card table,
+    /* .report-card table,
     .report-card th,
     .report-card td {
         border: 1px solid #000 !important;
@@ -129,20 +129,20 @@
     .report-card .comment-section {
         border: 2px solid #000 !important;
     }
-}
+} */
 
 /* Screen Styles */
-@media screen {
+/* @media screen {
     .report-card {
         background: white;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         border-radius: 8px;
         overflow: hidden;
     }
-}
+} */
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .report-card {
         font-size: 12px;
         padding: 10px;
@@ -171,4 +171,4 @@
         gap: 24px;
         text-align: center;
     }
-}
+} */
