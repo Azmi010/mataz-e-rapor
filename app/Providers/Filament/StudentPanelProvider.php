@@ -55,6 +55,6 @@ class StudentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 RoleRedirectMiddleware::class,
-            ]);
+            ])->topNavigation();
     }
 }

@@ -31,7 +31,7 @@ class GradingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Student::query()->with(['user','classModel']))
+            ->query(Student::query()->with(['user', 'classModel']))
             ->columns([
                 TextColumn::make('user.name')->label('Nama Siswa')->searchable()->sortable(),
                 TextColumn::make('nis')->label('NIS')->searchable()->sortable(),
@@ -46,11 +46,11 @@ class GradingResource extends Resource
                             ->placeholder('Pilih kelas...')
                             ->options(ClassModel::query()
                                 ->whereHas('academicYear', fn($q) => $q->where('status', true))
-                                ->pluck('name','id'))
+                                ->pluck('name', 'id'))
                             ->live()
                             ->required(),
                     ])
-                    ->query(fn(Builder $query, array $data) => $query->when($data['class_id'] ?? null, fn($q,$v)=>$q->where('class_id',$v))),
+                    ->query(fn(Builder $query, array $data) => $query->when($data['class_id'] ?? null, fn($q, $v) => $q->where('class_id', $v))),
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->recordActions([
@@ -63,7 +63,8 @@ class GradingResource extends Resource
                     ->label('Lihat Rapor')
                     ->icon('heroicon-o-document-text')
                     ->color('success')
-                    ->url(fn($record) => Pages\PreviewReport::getUrl(['record' => $record->getKey()])),
+                    ->url(fn($record) => route('rapor.pdf', $record->getKey()))
+                    ->openUrlInNewTab(),
             ])
             ->paginated([10, 25, 50])
             ->defaultPaginationPageOption(10)
