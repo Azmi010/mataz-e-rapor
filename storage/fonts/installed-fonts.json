@@ -1,0 +1,13 @@
+{
+    "amiri": {
+        "normal": "D:\\Lomba\\project\\mataz-rapor\\storage\\fonts\/amiri_normal_71fb74e73e65bcbb65874ca3bfe0d1c0",
+        "bold": "amiri_bold_538ce5b07ab26bf5c4b50638f63b9f17",
+        "italic": "D:\\Lomba\\project\\mataz-rapor\\storage\\fonts\/amiri_italic_b8491d7852e4d5869df4268e66ee0828"
+    },
+    "arabicfont": {
+        "normal": "arabicfont_normal_11aaded695fe4c9bed72ec7c96dce4de"
+    },
+    "tahoma": {
+        "normal": "tahoma_normal_40d10d2398ad116b1c0fa8ec85dff608"
+    }
+}

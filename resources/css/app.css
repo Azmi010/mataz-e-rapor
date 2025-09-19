@@ -1,3 +1,28 @@
+/* Filament custom styles - Import must be first */
+@import './filament/app.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix for missing Filament styles */
+.filament-main {
+    min-height: 100vh;
+}
+
+/* Custom table styling */
+.fi-table table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.fi-table th,
+.fi-table td {
+    border: 1px solid #e5e7eb;
+}
+
+/* Sticky column fix */
+.sticky {
+    position: sticky !important;
+    z-index: 10;
+}

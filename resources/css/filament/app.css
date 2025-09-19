@@ -1,0 +1,82 @@
+/* Filament Application CSS */
+
+/* Form improvements */
+.fi-form .fi-field-wrapper {
+    margin-bottom: 1rem;
+}
+
+/* Table improvements */
+.fi-ta-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e5e7eb;
+}
+
+.fi-ta-table th,
+.fi-ta-table td {
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem;
+}
+
+.fi-ta-table th:last-child,
+.fi-ta-table td:last-child {
+    border-right: none;
+}
+
+.fi-ta-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Sticky column styling */
+.fi-ta-table .sticky {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 10;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+/* Card styling */
+.fi-section {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Button styling */
+.fi-btn {
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+/* Form field styling */
+.fi-fo-field {
+    margin-bottom: 1rem;
+}
+
+/* Notification styling */
+.fi-no-notification {
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+/* Custom page styling */
+.fi-page {
+    padding: 1.5rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .fi-ta-table {
+        font-size: 0.875rem;
+    }
+
+    .sticky {
+        min-width: 150px;
+    }
+}

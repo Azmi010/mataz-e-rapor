@@ -15,4 +15,10 @@ class Activity extends Model
     {
         return $this->hasMany(DailyActivity::class);
     }
+
+    // Scope for school activities only
+    public function scopeSchoolOnly($query)
+    {
+        return $query->where('activity_type', 'Sekolah');
+    }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('report_card_id')->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subject_detail_id')->nullable()->constrained('subjects')->nullOnDelete(); // Jika detail dihapus
+            $table->foreignId('subject_detail_id')->nullable()->constrained('subject_details')->nullOnDelete();
             $table->integer('grade')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();

@@ -1,0 +1,174 @@
+/* Report Card Styles */
+/* .report-card {
+    font-family: 'Times New Roman', serif;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.report-card table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.report-card th,
+.report-card td {
+    border: 1px solid #000;
+    padding: 8px;
+    vertical-align: top;
+}
+
+.report-card .header h1,
+.report-card .header h2 {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.report-card .logo {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #059669, #047857);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+}
+
+.report-card .student-info table td {
+    border: none;
+    padding: 4px 0;
+}
+
+.report-card .grades-section table th {
+    background-color: #dcfce7;
+    font-weight: bold;
+    text-align: center;
+}
+
+.report-card .attendance-section table {
+    font-size: 13px;
+}
+
+.report-card .comment-section {
+    border: 2px solid #000;
+    min-height: 100px;
+    padding: 16px;
+}
+
+.report-card .signatures-section {
+    margin-top: 40px;
+}
+
+.signature-line {
+    border-bottom: 1px solid #000;
+    width: 120px;
+    margin: 0 auto 8px;
+} */
+
+/* Print Styles */
+/* @media print {
+    @page {
+        margin: 1.5cm;
+        size: A4;
+    }
+
+    body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .report-card {
+        font-size: 12px !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .report-card .header {
+        margin-bottom: 20px;
+    }
+
+    .report-card .logo {
+        background: #059669 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .report-card table th {
+        background-color: #dcfce7 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .report-card .grades-section,
+    .report-card .attendance-section,
+    .report-card .comment-section {
+        margin-bottom: 20px;
+        page-break-inside: avoid;
+    }
+
+    .report-card .signatures-section {
+        margin-top: 30px;
+        page-break-inside: avoid;
+    } */
+
+    /* Ensure borders are visible in print */
+    /* .report-card table,
+    .report-card th,
+    .report-card td {
+        border: 1px solid #000 !important;
+    }
+
+    .report-card .comment-section {
+        border: 2px solid #000 !important;
+    }
+} */
+
+/* Screen Styles */
+/* @media screen {
+    .report-card {
+        background: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+} */
+
+/* Responsive adjustments */
+/* @media (max-width: 768px) {
+    .report-card {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .report-card .header .flex {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .report-card .logo {
+        margin: 0 auto 16px;
+    }
+
+    .report-card .student-info .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .report-card .attendance-section .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-card .signatures-section .grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        text-align: center;
+    }
+} */
