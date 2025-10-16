@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Log;
 
 class Login extends FilamentLogin
 {
+    protected static ?string $title = 'Masuk';
+
+    public function getHeading(): string
+    {
+        return 'Masuk';
+    }
+
+    protected function getAuthenticateFormAction(): \Filament\Actions\Action
+    {
+        return parent::getAuthenticateFormAction()
+            ->label('Masuk');
+    }
+
     /**
      * Get the redirect URL after successful authentication.
      * This method is called by Filament after login.

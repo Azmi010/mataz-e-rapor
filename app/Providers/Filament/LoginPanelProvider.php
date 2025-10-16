@@ -56,8 +56,9 @@ class LoginPanelProvider extends PanelProvider
                 ],
             ])
             ->favicon(asset('img/logo.png'))
-            ->brandName('MATAZ - E-Rapor')
+            ->brandName('MATAZ')
             ->brandLogo(asset('img/logo.png'))
+            ->brandLogoHeight('6rem')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -26,6 +26,7 @@ class UserForm
                 TextInput::make('password')
                     ->label('Password')
                     ->password()
+                    ->revealable()
                     ->required(fn (string $context): bool => $context === 'create')
                     ->minLength(8)
                     ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))

@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -56,6 +57,10 @@ class StudentPanelProvider extends PanelProvider
                     950 => '#422006',
                 ],
             ])
+            ->favicon(asset('img/logo.png'))
+            ->brandName('MATAZ')
+            ->brandLogo(asset('img/logo.png'))
+            ->brandLogoHeight('2.5rem')
             ->discoverResources(in: app_path('Filament/Student/Resources'), for: 'App\Filament\Student\Resources')
             ->discoverPages(in: app_path('Filament/Student/Pages'), for: 'App\Filament\Student\Pages')
             ->pages([
@@ -65,6 +70,9 @@ class StudentPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+            ])
+            ->userMenuItems([
+                'logout' => MenuItem::make()->label('Keluar'),
             ])
             ->middleware([
                 EncryptCookies::class,
