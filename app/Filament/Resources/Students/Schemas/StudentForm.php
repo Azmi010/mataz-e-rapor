@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Students\Schemas;
 
 use App\Models\Student;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -45,6 +46,18 @@ class StudentForm
                     ->label('Nama Wali')
                     ->maxLength(255)
                     ->nullable(),
+                TextInput::make('phone')
+                    ->label('No. Telepon')
+                    ->tel()
+                    ->maxLength(20)
+                    ->nullable()
+                    ->helperText('Nomor telepon siswa atau wali'),
+                Textarea::make('address')
+                    ->label('Alamat')
+                    ->rows(3)
+                    ->maxLength(500)
+                    ->nullable()
+                    ->helperText('Alamat lengkap siswa'),
             ]);
     }
 }

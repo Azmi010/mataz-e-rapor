@@ -10,7 +10,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Student extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
+
+    protected $fillable = [
+        'user_id',
+        'class_id',
+        'nis',
+        'wali',
+        'phone',
+        'address',
+    ];
 
     public function user(): BelongsTo
     {

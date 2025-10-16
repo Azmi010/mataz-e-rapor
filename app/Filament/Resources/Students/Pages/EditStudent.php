@@ -10,11 +10,26 @@ class EditStudent extends EditRecord
 {
     protected static string $resource = StudentResource::class;
 
+    protected static ?string $title = 'Edit Siswa';
+
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->label('Hapus'),
         ];
+    }
+
+    protected function getSaveFormAction(): \Filament\Actions\Action
+    {
+        return parent::getSaveFormAction()
+            ->label('Simpan');
+    }
+
+    protected function getCancelFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCancelFormAction()
+            ->label('Batal');
     }
 
     protected function getRedirectUrl(): string

@@ -10,12 +10,26 @@ class EditTeacher extends EditRecord
 {
     protected static string $resource = TeacherResource::class;
 
+    protected static ?string $title = 'Edit Guru';
+
     protected function getHeaderActions(): array
     {
         return [
             DeleteAction::make()
                 ->label('Hapus'),
         ];
+    }
+
+    protected function getSaveFormAction(): \Filament\Actions\Action
+    {
+        return parent::getSaveFormAction()
+            ->label('Simpan');
+    }
+
+    protected function getCancelFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCancelFormAction()
+            ->label('Batal');
     }
 
     protected function getRedirectUrl(): string
