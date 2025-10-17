@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Teachers\Schemas;
 
 use App\Models\Teacher;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -35,6 +36,18 @@ class TeacherForm
                     ->required()
                     ->maxLength(30)
                     ->unique(ignoreRecord: true),
+                TextInput::make('phone')
+                    ->label('No. Telepon')
+                    ->tel()
+                    ->maxLength(20)
+                    ->nullable()
+                    ->helperText('Nomor telepon guru'),
+                Textarea::make('address')
+                    ->label('Alamat')
+                    ->rows(3)
+                    ->maxLength(500)
+                    ->nullable()
+                    ->helperText('Alamat lengkap guru'),
             ]);
     }
 }

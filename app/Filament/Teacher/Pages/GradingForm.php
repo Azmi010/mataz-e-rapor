@@ -44,11 +44,11 @@ class GradingForm extends Page implements HasForms
         $this->student = Student::with('user')->findOrFail($student);
         $this->semester = Semester::with('academicYear')->findOrFail($semester);
         $this->class = ClassModel::with('subjects.details')->findOrFail($class);
-        
+
         $this->loadSubjects();
         $this->loadAttendanceSummary();
         $this->loadExistingGrades();
-        
+
         $this->form->fill($this->getFormData());
     }
 
@@ -138,9 +138,9 @@ class GradingForm extends Page implements HasForms
 
         // Add teacher comment
         $schema[] = Textarea::make('teacher_comment')
-            ->label('Komentar Wali Kelas')
+            ->label('Catatan Wali Kelas')
             ->rows(4)
-            ->placeholder('Masukkan komentar untuk siswa...');
+            ->placeholder('Masukkan catatan untuk siswa...');
 
         return $form
             ->schema($schema)

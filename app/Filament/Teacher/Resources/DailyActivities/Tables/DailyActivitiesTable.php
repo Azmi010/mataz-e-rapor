@@ -177,9 +177,7 @@ class DailyActivitiesTable
                     Select::make('class_id')
                         ->label('Pilih Kelas')
                         ->placeholder('Pilih kelas...')
-                        ->options(ClassModel::query()
-                            ->whereHas('academicYear', fn($q) => $q->where('status', true))
-                            ->pluck('name', 'id'))
+                        ->options(ClassModel::query()->pluck('name', 'id'))
                         ->live()
                         ->required(),
                 ])

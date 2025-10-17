@@ -10,6 +10,8 @@ class ListTeachers extends ListRecords
 {
     protected static string $resource = TeacherResource::class;
 
+    protected static ?string $title = 'Data Guru';
+
     protected function getHeaderActions(): array
     {
         return [

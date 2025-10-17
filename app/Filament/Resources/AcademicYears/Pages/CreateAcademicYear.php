@@ -11,6 +11,26 @@ class CreateAcademicYear extends CreateRecord
 {
     protected static string $resource = AcademicYearResource::class;
 
+    protected static ?string $title = 'Tambah Tahun Ajaran';
+
+    protected function getCreateFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCreateFormAction()
+            ->label('Tambah');
+    }
+
+    protected function getCreateAnotherFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCreateAnotherFormAction()
+            ->label('Tambah & Tambah Lainnya');
+    }
+
+    protected function getCancelFormAction(): \Filament\Actions\Action
+    {
+        return parent::getCancelFormAction()
+            ->label('Batal');
+    }
+
     protected function handleRecordCreation(array $data): Model
     {
         if ($data['status']) {

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ClassModels\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
@@ -52,11 +53,13 @@ class ClassModelsTable
             ->recordActions([
                 EditAction::make()
                     ->label('Edit'),
+                DeleteAction::make()
+                    ->label('Hapus'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Hapus Terpilih'),
+                        ->label('Hapus yang dipilih'),
                 ]),
             ]);
     }

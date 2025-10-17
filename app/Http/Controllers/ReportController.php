@@ -192,7 +192,7 @@ class ReportController extends Controller
         $pdf->Cell(35, 6, 'Alamat', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
         $pdf->SetFont('times', '', 13);
-        $pdf->Cell(70, 6, $student->classModel->name ?? '-', 0, 0, 'L');
+        $pdf->Cell(70, 6, $student->address ?? '-', 0, 0, 'L');
 
         $pdf->SetXY(15, $y_start + 28);
         $pdf->SetFont('times', '', 13);

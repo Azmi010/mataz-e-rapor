@@ -10,6 +10,8 @@ class ListSubjects extends ListRecords
 {
     protected static string $resource = SubjectResource::class;
 
+    protected static ?string $title = 'Data Mata Pelajaran';
+
     protected function getHeaderActions(): array
     {
         return [

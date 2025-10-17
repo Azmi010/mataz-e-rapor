@@ -10,6 +10,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -30,10 +31,38 @@ class TeacherPanelProvider extends PanelProvider
         return $panel
             ->id('teacher')
             ->path('teacher')
-            ->login()
+            ->loginRouteSlug('/auth/login')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => [
+                    50 => '#f0fdf4',
+                    100 => '#dcfce7',
+                    200 => '#bbf7d0',
+                    300 => '#86efac',
+                    400 => '#4ade80',
+                    500 => '#16a34a',
+                    600 => '#15803d',
+                    700 => '#166534',
+                    800 => '#14532d',
+                    900 => '#052e16',
+                    950 => '#052e16',
+                ],
+                'secondary' => [
+                    50 => '#fefce8',
+                    100 => '#fef9c3',
+                    200 => '#fef08a',
+                    300 => '#fde047',
+                    400 => '#facc15',
+                    500 => '#eab308',
+                    600 => '#ca8a04',
+                    700 => '#a16207',
+                    800 => '#854d0e',
+                    900 => '#713f12',
+                    950 => '#422006',
+                ],
             ])
+            ->favicon(asset('img/logo.png'))
+            ->brandName('MATAZ')
+            ->brandLogo(fn () => view('filament.brand'))
             ->discoverResources(in: app_path('Filament/Teacher/Resources'), for: 'App\Filament\Teacher\Resources')
             ->pages([
                 Dashboard::class,
@@ -42,9 +71,13 @@ class TeacherPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\Filament\Teacher\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                \App\Filament\Teacher\Widgets\TeacherStatsOverview::class,
+                \App\Filament\Teacher\Widgets\UpcomingActivities::class,
+                \App\Filament\Teacher\Widgets\RecentStudents::class,
             ])
+            ->darkMode(true)
+            ->darkModeBrandLogo(fn () => view('filament.brand'))
+            ->renderHook('body.end', fn () => view('filament.theme-sync'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
