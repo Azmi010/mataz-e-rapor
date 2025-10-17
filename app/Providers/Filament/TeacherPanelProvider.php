@@ -71,8 +71,9 @@ class TeacherPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\Filament\Teacher\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                \App\Filament\Teacher\Widgets\TeacherStatsOverview::class,
+                \App\Filament\Teacher\Widgets\UpcomingActivities::class,
+                \App\Filament\Teacher\Widgets\RecentStudents::class,
             ])
             ->darkMode(true)
             ->darkModeBrandLogo(fn () => view('filament.brand'))

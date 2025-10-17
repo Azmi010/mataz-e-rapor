@@ -139,7 +139,7 @@ class FillGrades extends Page implements Forms\Contracts\HasForms
         return $form
             ->schema([
                 Forms\Components\Repeater::make('grades')
-                    ->label('Nilai Mapel')
+                    ->label('Daftar Nilai')
                     ->schema([
                         Forms\Components\Hidden::make('subject_id'),
                         Forms\Components\Hidden::make('subject_detail_id'),
@@ -150,8 +150,8 @@ class FillGrades extends Page implements Forms\Contracts\HasForms
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(100)
-                            ->label('Skor')
-                            ->placeholder('')
+                            ->label('Nilai')
+                            ->placeholder('Contoh: 85')
                             ->helperText('Kosongkan jika belum diisi'),
                     ])
                     ->columns(3)
@@ -160,7 +160,8 @@ class FillGrades extends Page implements Forms\Contracts\HasForms
                     ->reorderable(false),
                 Forms\Components\Textarea::make('teacher_comment')
                     ->label('Catatan Wali Kelas')
-                    ->rows(4),
+                    ->rows(4)
+                    ->placeholder('Masukkan catatan untuk siswa...'),
             ])
             ->statePath('data');
     }
