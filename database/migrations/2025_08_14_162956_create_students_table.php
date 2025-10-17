@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('class_id')->nullable()->constrained('class_models')->nullOnDelete();
             $table->string('nis')->unique();
             $table->string('wali')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
             $table->timestamps();
         });
     }

@@ -18,18 +18,6 @@ class TeacherSeeder extends Seeder
         // Buat beberapa user guru
         $teacherUsers = [
             [
-                'name' => 'Prof. Siti Aminah',
-                'email' => 'siti.aminah@teacher.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'teacher',
-            ],
-            [
-                'name' => 'Dr. Ahmad Fauzi',
-                'email' => 'ahmad.fauzi@teacher.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'teacher',
-            ],
-            [
                 'name' => 'Ustadzah Fatimah',
                 'email' => 'fatimah@teacher.mataz.sch.id',
                 'password' => Hash::make('password'),

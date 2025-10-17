@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\AcademicYear;
 use App\Models\ClassModel;
-use App\Models\Subject;
 use App\Models\Student;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,20 +22,17 @@ class ClassModelSeeder extends Seeder
         }
 
         $classes = [
-            'X IPA 1',
-            'X IPA 2',
-            'XI IPA 1',
-            'XII IPA 1',
+            'Kelas 1',
+            'Kelas 2',
+            'Kelas 3',
+            'Kelas 4',
         ];
 
         foreach ($classes as $className) {
-            $class = ClassModel::create([
+            ClassModel::create([
                 'name' => $className,
                 'academic_year_id' => $activeYear->id,
             ]);
-
-            $subjects = Subject::inRandomOrder()->limit(rand(8, 12))->pluck('id');
-            $class->subjects()->attach($subjects);
         }
 
         $students = Student::all();

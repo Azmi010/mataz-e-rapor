@@ -12,7 +12,7 @@ Route::get('/', function () {
             'admin' => redirect('/admin'),
             'teacher' => redirect('/teacher'),
             'student' => redirect('/student'),
-            default => redirect('/auth/login'),
+            default => redirect('/login'),
         };
     }
     return view('welcome');
@@ -24,3 +24,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/teacher/grading/{student}/rapor-pdf', [ReportController::class, 'generateReport'])
     ->name('rapor.pdf');
+
+// Named route untuk login redirect - diperlukan oleh Laravel auth middleware
+// Filament sudah menangani /login, route ini hanya untuk named route reference
+Route::redirect('/auth/login', '/login')->name('login');

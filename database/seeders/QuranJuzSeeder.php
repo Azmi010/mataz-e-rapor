@@ -17,37 +17,37 @@ class QuranJuzSeeder extends Seeder
         Subject::where('name', 'LIKE', 'Juz%')->delete();
 
         $juz1 = Subject::create([
-            'name' => 'Juz 1 - الم',
+            'name' => 'الم',
             'description' => 'Juz pertama Al-Quran dimulai dari surat Al-Fatihah hingga Al-Baqarah ayat 141',
             'has_details' => false
         ]);
 
         $juz2 = Subject::create([
-            'name' => 'Juz 2 - سيقول',
+            'name' => 'سيقول',
             'description' => 'Juz kedua Al-Quran dari Al-Baqarah ayat 142 hingga ayat 252',
             'has_details' => false
         ]);
 
         $juz3 = Subject::create([
-            'name' => 'Juz 3 - تلك الرسل',
+            'name' => 'تلك الرسل',
             'description' => 'Juz ketiga Al-Quran dari Al-Baqarah ayat 253 hingga Ali Imran ayat 92',
             'has_details' => false
         ]);
 
         $juz4 = Subject::create([
-            'name' => 'Juz 4 - لن تنالوا',
+            'name' => 'لن تنالوا',
             'description' => 'Juz keempat Al-Quran dari Ali Imran ayat 93 hingga An-Nisa ayat 23',
             'has_details' => false
         ]);
 
         $juz5 = Subject::create([
-            'name' => 'Juz 5 - والمحصنات',
+            'name' => 'والمحصنات',
             'description' => 'Juz kelima Al-Quran dari An-Nisa ayat 24 hingga ayat 147',
             'has_details' => false
         ]);
 
         $juz6 = Subject::create([
-            'name' => 'Juz 6 - لا يحب الله',
+            'name' => 'لا يحب الله',
             'description' => 'Juz keenam Al-Quran dari An-Nisa ayat 148 hingga Al-Maidah ayat 81',
             'has_details' => false
         ]);

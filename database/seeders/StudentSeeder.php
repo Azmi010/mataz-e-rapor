@@ -25,30 +25,6 @@ class StudentSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'student',
             ],
-            [
-                'name' => 'Siti Nurhaliza',
-                'email' => 'siti.nurhaliza@student.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'student',
-            ],
-            [
-                'name' => 'Budi Santoso',
-                'email' => 'budi.santoso@student.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'student',
-            ],
-            [
-                'name' => 'Dewi Kartika',
-                'email' => 'dewi.kartika@student.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'student',
-            ],
-            [
-                'name' => 'Eko Prasetyo',
-                'email' => 'eko.prasetyo@student.mataz.sch.id',
-                'password' => Hash::make('password'),
-                'role' => 'student',
-            ],
         ];
 
         foreach ($studentUsers as $userData) {
