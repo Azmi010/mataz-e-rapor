@@ -10,6 +10,8 @@ class ListAcademicYears extends ListRecords
 {
     protected static string $resource = AcademicYearResource::class;
 
+    protected static ?string $title = 'Daftar Tahun Ajaran';
+
     protected function getHeaderActions(): array
     {
         return [

@@ -62,8 +62,7 @@ class TeacherPanelProvider extends PanelProvider
             ])
             ->favicon(asset('img/logo.png'))
             ->brandName('MATAZ')
-            ->brandLogo(asset('img/logo.png'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogo(fn () => view('filament.brand'))
             ->discoverResources(in: app_path('Filament/Teacher/Resources'), for: 'App\Filament\Teacher\Resources')
             ->pages([
                 Dashboard::class,
@@ -75,9 +74,9 @@ class TeacherPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-            ->userMenuItems([
-                'logout' => MenuItem::make()->label('Keluar'),
-            ])
+            ->darkMode(true)
+            ->darkModeBrandLogo(fn () => view('filament.brand'))
+            ->renderHook('body.end', fn () => view('filament.theme-sync'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

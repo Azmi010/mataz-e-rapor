@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -49,9 +50,14 @@
       *:focus-visible { outline: 2px solid #E5B90A; outline-offset: 2px; }
       body { font-feature-settings: "rlig" 1, "calt" 1; }
     </style>
+
+    @include('layouts.dark-mode-fix')
+
+    {{-- Theme Sync Script - Load sebelum body untuk mencegah flash --}}
+    <script src="{{ asset('js/theme-sync.js') }}"></script>
   </head>
-  <body class="font-sans antialiased text-neutral-900 bg-neutral-25">
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-neutral-200">
+  <body class="font-sans antialiased text-neutral-900 bg-neutral-25 dark:bg-neutral-900 dark:text-white transition-colors duration-200">
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-neutral-800/80 backdrop-blur border-b border-neutral-200 dark:border-neutral-700 transition-colors duration-200">
       <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <a href="{{ url('/') }}" class="flex items-center gap-3">
           <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10 ring-1 ring-brand/20">
@@ -63,25 +69,57 @@
           </span>
           <div class="leading-tight">
             <p class="font-semibold text-brand">MATAZ</p>
-            <p class="text-xs text-neutral-600">Markaz Tahfidz El‑Zahro</p>
+            <p class="text-xs text-neutral-600 dark:text-neutral-400">Markaz Tahfidz El‑Zahro</p>
           </div>
         </a>
-        <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-neutral-900 hover:bg-neutral-100" aria-label="Buka menu">
+        <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700" aria-label="Buka menu">
           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <ul class="hidden md:flex items-center gap-6 text-sm">
-          <li><a href="#tentang" class="hover:text-brand">Tentang</a></li>
-          <li><a href="#program" class="hover:text-brand">Program</a></li>
-          <li><a href="#pengajar" class="hover:text-brand">Pengajar</a></li>
-          <li><a href="#testimoni" class="hover:text-brand">Testimoni</a></li>
-          <li><a href="#kontak" class="hover:text-brand">Kontak</a></li>
+          <li><a href="#tentang" class="hover:text-brand dark:text-neutral-300 dark:hover:text-accent transition">Tentang</a></li>
+          <li><a href="#program" class="hover:text-brand dark:text-neutral-300 dark:hover:text-accent transition">Program</a></li>
+          <li><a href="#pengajar" class="hover:text-brand dark:text-neutral-300 dark:hover:text-accent transition">Pengajar</a></li>
+          <li><a href="#testimoni" class="hover:text-brand dark:text-neutral-300 dark:hover:text-accent transition">Testimoni</a></li>
+          <li><a href="#kontak" class="hover:text-brand dark:text-neutral-300 dark:hover:text-accent transition">Kontak</a></li>
         </ul>
-        <a href="/login" class="hidden md:inline-flex items-center gap-2 rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:bg-brand-dark transition">
-          Masuk
-          <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 4l7.2 8-7.2 8H11l5.4-6H4v-4h12.4L11 6h2.2z"/></svg>
-        </a>
+        <div class="hidden md:flex items-center gap-3">
+          {{-- Theme Toggle Button --}}
+          <button
+            id="theme-toggle"
+            type="button"
+            class="inline-flex items-center justify-center rounded-lg p-2 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 transition"
+            aria-label="Toggle dark mode"
+          >
+            <svg id="theme-toggle-light-icon" class="h-5 w-5 hidden dark:block" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg id="theme-toggle-dark-icon" class="h-5 w-5 block dark:hidden" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
+          </button>
+
+          <a href="/login" class="inline-flex items-center gap-2 rounded-lg bg-brand text-white px-4 py-2 text-sm font-medium hover:bg-brand-dark transition">
+            Masuk
+            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 4l7.2 8-7.2 8H11l5.4-6H4v-4h12.4L11 6h2.2z"/></svg>
+          </a>
+        </div>
       </nav>
     </header>
+
+    <script>
+      // Theme toggle handler
+      document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('theme-toggle');
+
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', function() {
+            if (window.matazTheme) {
+              window.matazTheme.toggle();
+            }
+          });
+        }
+      });
+    </script>
 
     <main>@yield('content')</main>
 

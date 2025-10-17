@@ -60,8 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->favicon(asset('img/logo.png'))
             ->brandName('MATAZ')
-            ->brandLogo(asset('img/logo.png'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogo(fn () => view('filament.brand'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -72,9 +71,9 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
-            ->userMenuItems([
-                'logout' => MenuItem::make()->label('Keluar'),
-            ])
+            ->darkMode(true)
+            ->darkModeBrandLogo(fn () => view('filament.brand'))
+            ->renderHook('body.end', fn () => view('filament.theme-sync'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

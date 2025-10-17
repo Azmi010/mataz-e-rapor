@@ -10,6 +10,8 @@ class ListClassModels extends ListRecords
 {
     protected static string $resource = ClassModelResource::class;
 
+    protected static ?string $title = 'Data Kelas';
+
     protected function getHeaderActions(): array
     {
         return [
