@@ -24,6 +24,11 @@ class ClassModelsTable
                     ->label('Tahun Akademik')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('homeroomTeacher.user.name')
+                    ->label('Wali Kelas')
+                    ->sortable()
+                    ->searchable()
+                    ->default('-'),
                 TextColumn::make('subjects_count')
                     ->label('Jumlah Mata Pelajaran')
                     ->counts('subjects')

@@ -28,4 +28,9 @@ class ClassModel extends Model
     {
         return $this->hasMany(Student::class, 'class_id');
     }
+
+    public function homeroomTeacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class, 'homeroom_teacher_id');
+    }
 }

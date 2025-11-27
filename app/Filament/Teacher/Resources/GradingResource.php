@@ -4,6 +4,7 @@ namespace App\Filament\Teacher\Resources;
 
 use App\Filament\Teacher\Resources\GradingResource\Pages;
 use App\Models\Student;
+use App\Models\Teacher;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,6 +17,7 @@ use App\Models\ClassModel;
 use BackedEnum;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class GradingResource extends Resource
 {
@@ -30,26 +32,31 @@ class GradingResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $teacher = Teacher::where('user_id', Auth::id())->first();
+        $homeroomClassId = null;
+
+        if ($teacher) {
+            $homeroomClass = ClassModel::where('homeroom_teacher_id', $teacher->id)
+                ->whereHas('academicYear', fn($q) => $q->where('status', true))
+                ->first();
+
+            if ($homeroomClass) {
+                $homeroomClassId = $homeroomClass->id;
+            }
+        }
+
         return $table
-            ->query(Student::query()->with(['user', 'classModel']))
+            ->query(
+                Student::query()
+                    ->with(['user', 'classModel'])
+                    ->when($homeroomClassId, fn($q) => $q->where('class_id', $homeroomClassId))
+            )
             ->columns([
                 TextColumn::make('user.name')->label('Nama Siswa')->searchable()->sortable(),
                 TextColumn::make('nis')->label('NIS')->searchable()->sortable(),
                 TextColumn::make('classModel.name')->label('Kelas'),
             ])
-            ->filters([
-                Filter::make('class_filter')
-                    ->label('Filter Kelas')
-                    ->form([
-                        Select::make('class_id')
-                            ->label('Pilih Kelas')
-                            ->placeholder('Pilih kelas...')
-                            ->options(ClassModel::query()->pluck('name', 'id'))
-                            ->live()
-                            ->required(),
-                    ])
-                    ->query(fn(Builder $query, array $data) => $query->when($data['class_id'] ?? null, fn($q, $v) => $q->where('class_id', $v))),
-            ])
+            ->filters([])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->recordActions([
                 Action::make('fillGrades')

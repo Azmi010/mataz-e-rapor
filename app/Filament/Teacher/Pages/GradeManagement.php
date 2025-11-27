@@ -9,6 +9,7 @@ use App\Models\ReportCardGrade;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Teacher;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -16,7 +17,9 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class GradeManagement extends Page implements HasForms
 {
@@ -35,8 +38,7 @@ class GradeManagement extends Page implements HasForms
     public $semester_id = null;
     public $class_id = null;
     public $students = [];
-    
-    // Modal state
+
     public $showGradingModal = false;
     public $selectedStudent = null;
     public $selectedStudentSubjects = [];
@@ -46,6 +48,21 @@ class GradeManagement extends Page implements HasForms
 
     public function mount(): void
     {
+        $teacher = Teacher::where('user_id', Auth::id())->first();
+
+        if ($teacher) {
+            $homeroomClass = ClassModel::where('homeroom_teacher_id', $teacher->id)
+                ->whereHas('academicYear', fn($q) => $q->where('status', true))
+                ->first();
+
+            if ($homeroomClass) {
+                $this->class_id = $homeroomClass->id;
+                $this->students = Student::where('class_id', $this->class_id)
+                    ->with('user')
+                    ->get();
+            }
+        }
+
         $this->form->fill();
     }
 
@@ -64,18 +81,6 @@ class GradeManagement extends Page implements HasForms
                 ->live()
                 ->afterStateUpdated(function ($state) {
                     $this->semester_id = $state;
-                    $this->loadClassData($this->class_id);
-                }),
-
-            Select::make('class_id')
-                ->label('Pilih Kelas')
-                ->options(ClassModel::query()
-                    ->whereHas('academicYear', fn($q) => $q->where('status', true))
-                    ->pluck('name', 'id'))
-                ->live()
-                ->afterStateUpdated(function ($state) {
-                    $this->class_id = $state;
-                    $this->loadClassData($state);
                 }),
         ];
     }
@@ -132,11 +137,11 @@ class GradeManagement extends Page implements HasForms
             return;
         }
 
-        // Load subjects for the class
-        $class = ClassModel::with('subjects.details')->findOrFail($this->class_id);
+        $class = ClassModel::with(['subjects' => function($query) {
+            $query->where('is_group', false)->with('details', 'parent');
+        }])->findOrFail($this->class_id);
         $this->selectedStudentSubjects = $class->subjects;
 
-        // Load attendance summary
         $attendances = Attendance::where('student_id', $this->selectedStudent->id)
             ->where('semester_id', $this->semester_id)
             ->get();
@@ -148,7 +153,6 @@ class GradeManagement extends Page implements HasForms
             'Alpha' => $attendances->where('status', 'Alpha')->count(),
         ];
 
-        // Load existing grades
         $reportCard = ReportCard::where([
             'student_id' => $this->selectedStudent->id,
             'semester_id' => $this->semester_id,
@@ -161,7 +165,6 @@ class GradeManagement extends Page implements HasForms
                 ->toArray();
         }
 
-        // Setup form data
         $this->gradingData = [
             'teacher_comment' => $reportCard->teacher_comment ?? '',
         ];
@@ -175,7 +178,6 @@ class GradeManagement extends Page implements HasForms
     {
         try {
             DB::transaction(function () {
-                // Create or update report card
                 $reportCard = ReportCard::updateOrCreate(
                     [
                         'student_id' => $this->selectedStudent->id,
@@ -187,7 +189,6 @@ class GradeManagement extends Page implements HasForms
                     ]
                 );
 
-                // Save grades
                 foreach ($this->selectedStudentSubjects as $subject) {
                     $gradeKey = "grade_" . $subject->id;
                     if (isset($this->gradingData[$gradeKey]) && $this->gradingData[$gradeKey] !== '') {
