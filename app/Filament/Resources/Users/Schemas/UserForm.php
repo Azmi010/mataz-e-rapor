@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\ClassModel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -41,7 +42,62 @@ class UserForm
                     ])
                     ->required()
                     ->default('student')
+                    ->live()
                     ->helperText('Pilih peran untuk menentukan akses panel yang sesuai.'),
+
+                TextInput::make('teacher.nip')
+                    ->label('NIP')
+                    ->required()
+                    ->maxLength(255)
+                    ->visible(fn (callable $get) => $get('role') === 'teacher')
+                    ->helperText('Nomor Induk Pegawai'),
+
+                TextInput::make('teacher.phone')
+                    ->label('No. HP')
+                    ->tel()
+                    ->maxLength(20)
+                    ->visible(fn (callable $get) => $get('role') === 'teacher')
+                    ->helperText('Nomor telepon yang bisa dihubungi'),
+
+                TextInput::make('teacher.address')
+                    ->label('Alamat')
+                    ->maxLength(500)
+                    ->visible(fn (callable $get) => $get('role') === 'teacher')
+                    ->helperText('Alamat lengkap tempat tinggal'),
+
+                TextInput::make('student.nis')
+                    ->label('NIS')
+                    ->required()
+                    ->maxLength(255)
+                    ->visible(fn (callable $get) => $get('role') === 'student')
+                    ->helperText('Nomor Induk Siswa'),
+
+                Select::make('student.class_id')
+                    ->label('Kelas')
+                    ->options(ClassModel::pluck('name', 'id'))
+                    ->searchable()
+                    ->required()
+                    ->visible(fn (callable $get) => $get('role') === 'student')
+                    ->helperText('Kelas siswa saat ini'),
+
+                TextInput::make('student.wali')
+                    ->label('Nama Wali')
+                    ->maxLength(255)
+                    ->visible(fn (callable $get) => $get('role') === 'student')
+                    ->helperText('Nama orang tua/wali siswa'),
+
+                TextInput::make('student.phone')
+                    ->label('No. HP Wali')
+                    ->tel()
+                    ->maxLength(20)
+                    ->visible(fn (callable $get) => $get('role') === 'student')
+                    ->helperText('Nomor telepon wali yang bisa dihubungi'),
+
+                TextInput::make('student.address')
+                    ->label('Alamat')
+                    ->maxLength(500)
+                    ->visible(fn (callable $get) => $get('role') === 'student')
+                    ->helperText('Alamat lengkap tempat tinggal'),
             ]);
     }
 }
