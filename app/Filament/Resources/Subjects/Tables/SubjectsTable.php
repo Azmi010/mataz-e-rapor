@@ -19,7 +19,23 @@ class SubjectsTable
                 TextColumn::make('name')
                     ->label('Nama Mata Pelajaran')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('semibold'),
+
+                TextColumn::make('category.name')
+                    ->label('Kategori')
+                    ->sortable()
+                    ->default('-')
+                    ->badge()
+                    ->color('info'),
+
+                IconColumn::make('is_tahfidz')
+                    ->label('Tahfidz')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
 
                 TextColumn::make('description')
                     ->label('Deskripsi')
