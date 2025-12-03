@@ -12,7 +12,7 @@ class ReportController extends Controller
 {
     public function generateReport($studentId)
     {
-        $student = Student::findOrFail($studentId);
+        $student = Student::with(['classModel.homeroomTeacher.user'])->findOrFail($studentId);
         $currentDate = now()->format('Y-m-d');
         $currentSemester = Semester::whereHas('academicYear', function ($q) {
             $q->where('status', true);
@@ -31,7 +31,7 @@ class ReportController extends Controller
 
         $reportCard = $student
             ->reportCards()
-            ->with(['semester.academicYear', 'grades.subject', 'grades.subjectDetail'])
+            ->with(['semester.academicYear', 'grades.subject.category', 'grades.subjectDetail'])
             ->whereHas('semester', function ($q) {
                 $q->whereHas('academicYear', fn($aq) => $aq->where('status', true));
             })
@@ -127,6 +127,263 @@ class ReportController extends Controller
 
         $pdf->AddPage();
 
+        // KOP SURAT - Logo kiri dan kanan
+        $pdf->Image(public_path('img/logo.png'), 15, 10, 25, 25);
+        $pdf->Image(public_path('img/logo.png'), 170, 10, 25, 25);
+
+        // Judul Kop
+        $pdf->SetFont('times', 'B', 18);
+        $pdf->SetY(12);
+        $pdf->Cell(0, 5, 'YAYASAN BAITUL HIKMAH ISLAMI', 0, 1, 'C');
+        $pdf->SetFont('times', 'B', 16);
+        $pdf->Cell(0, 6, 'MI Tahfidz El-Zahro', 0, 1, 'C');
+        $pdf->SetFont('times', '', 11);
+        $pdf->Cell(0, 4, 'Dsn. Poncol, Ds. Banjarejo, Kec. Karangbinangun, Kab. Lamongan 62251', 0, 1, 'C');
+        $pdf->SetFont('times', '', 11);
+        $pdf->Cell(0, 4, 'SK MENKUMHAM RI: AHU-0021017.AH.01.04.Tahun 2021 TANGGAL 30 Agustus 2021', 0, 1, 'C');
+        $pdf->Cell(0, 4, 'No. HP 081330578575/081332222366 Email: officialmarkaztahfidzelzahro@gmail.com', 0, 1, 'C');
+
+        // Garis pemisah
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->SetLineWidth(0.5);
+        $pdf->Line(15, 45, 195, 45);
+        $pdf->SetLineWidth(0.2);
+        $pdf->Line(15, 45.5, 195, 45.5);
+
+        $pdf->Ln(4);
+
+        // Data Siswa
+        $pdf->SetFont('times', '', 11);
+        $leftCol = 15;
+        $rightCol = 110;
+        $y = $pdf->GetY();
+
+        // Kolom Kiri
+        $pdf->SetXY($leftCol, $y);
+        $pdf->Cell(30, 5, 'Nama', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, $student->user->name ?? '-', 0, 1);
+
+        $pdf->SetX($leftCol);
+        $pdf->Cell(30, 5, 'NIS/NISN', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, $student->nis ?? '-', 0, 1);
+
+        $pdf->SetX($leftCol);
+        $pdf->Cell(30, 5, 'Madrasah', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, 'MI Tahfidz El-Zahro', 0, 1);
+
+        $pdf->SetX($leftCol);
+        $pdf->Cell(30, 5, 'Alamat', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, $student->address ?? '-', 0, 1);
+
+        // Kolom Kanan
+        $pdf->SetXY($rightCol, $y);
+        $pdf->Cell(30, 5, 'Kelas', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, $student->classModel->name ?? '-', 0, 1);
+
+        $pdf->SetXY($rightCol, $y + 5);
+        $pdf->Cell(30, 5, 'Fase', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $pdf->Cell(0, 5, '-', 0, 1);
+
+        $pdf->SetXY($rightCol, $y + 10);
+        $pdf->Cell(30, 5, 'Semester', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $semesterType = $reportCard && $reportCard->semester
+            ? ($reportCard->semester->semester_type == 'Ganjil' ? 'Ganjil' : 'Genap')
+            : '-';
+        $pdf->Cell(0, 5, $semesterType, 0, 1);
+
+        $pdf->SetXY($rightCol, $y + 15);
+        $pdf->Cell(30, 5, 'Tahun Pelajaran', 0, 0);
+        $pdf->Cell(3, 5, ':', 0, 0);
+        $academicYearName = $reportCard && $reportCard->semester && $reportCard->semester->academicYear
+            ? $reportCard->semester->academicYear->name
+            : '-';
+        $pdf->Cell(0, 5, $academicYearName, 0, 1);
+
+        // Garis pemisah
+        $pdf->SetDrawColor(0, 0, 0);
+        $pdf->SetLineWidth(0.5);
+        $pdf->Line(15, 67, 195, 67);
+        $pdf->SetLineWidth(0.2);
+        $pdf->Line(15, 67.5, 195, 67.5);
+
+        $pdf->Ln(7);
+
+        // Judul Rapor
+        $pdf->SetFont('times', 'B', 13);
+        $pdf->Cell(0, 6, 'CAPAIAN HASIL BELAJAR', 0, 1, 'C');
+
+        $pdf->Ln(5);
+
+        // HALAMAN PERTAMA: RAPOR MATA PELAJARAN (NON-TAHFIDZ)
+        $y_start = $pdf->GetY();
+
+        if ($reportCard && $reportCard->grades->count() > 0) {
+            // Pisahkan nilai tahfidz dan non-tahfidz
+            $tahfidzGrades = collect();
+            $nonTahfidzGrades = collect();
+
+            foreach ($reportCard->grades as $grade) {
+                if ($grade->subject && $grade->subject->is_tahfidz) {
+                    $tahfidzGrades->push($grade);
+                } else {
+                    $nonTahfidzGrades->push($grade);
+                }
+            }
+
+            // Hitung rata-rata tahfidz (dari semua nilai tahfidz yang ada detail)
+            $tahfidzDetailGrades = $tahfidzGrades->where('subject_detail_id', '!=', null);
+            $tahfidzAverage = $tahfidzDetailGrades->count() > 0
+                ? round($tahfidzDetailGrades->avg('grade'), 1)
+                : 0;
+
+            // Kelompokkan nilai non-tahfidz berdasarkan kategori
+            $groupedByCategory = collect();
+            foreach ($nonTahfidzGrades as $grade) {
+                if ($grade->subject) {
+                    $categoryId = $grade->subject->category_id ?? 'uncategorized';
+                    if (!$groupedByCategory->has($categoryId)) {
+                        $groupedByCategory->put($categoryId, collect());
+                    }
+                    $groupedByCategory->get($categoryId)->push($grade);
+                }
+            }
+
+            // Header tabel
+            $pdf->SetFont('times', 'B', 11);
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->Cell(8, 7, 'NO', 1, 0, 'C', true);
+            $pdf->Cell(70, 7, 'MATA PELAJARAN', 1, 0, 'C', true);
+            $pdf->Cell(15, 7, 'KKM', 1, 0, 'C', true);
+            $pdf->Cell(15, 7, 'NILAI', 1, 0, 'C', true);
+            $pdf->Cell(72, 7, 'DESKRIPSI', 1, 1, 'C', true);
+            $getGradeInfo = function ($gradeValue) {
+                if ($gradeValue >= 95) return 'Istimewa';
+                if ($gradeValue >= 85) return 'Sangat Baik';
+                if ($gradeValue >= 75) return 'Baik';
+                if ($gradeValue >= 65) return 'Cukup';
+                return 'Kurang';
+            };
+
+            // Tampilkan nilai per kategori
+            $no = 1;
+            $pdf->SetFont('times', '', 11);
+
+            foreach ($groupedByCategory as $categoryId => $grades) {
+                // Ambil nama kategori
+                $categoryName = 'Lainnya';
+                if ($categoryId !== 'uncategorized') {
+                    $firstGrade = $grades->first();
+                    if ($firstGrade && $firstGrade->subject && $firstGrade->subject->category) {
+                        $categoryName = $firstGrade->subject->category->name;
+                    }
+                }
+
+                // Header kategori
+                $pdf->SetFont('times', 'B', 11);
+                $pdf->SetFillColor(230, 230, 230);
+                $pdf->Cell(180, 7, $categoryName, 1, 1, 'L', true);
+
+                // Group by subject dalam kategori
+                $groupedBySubject = $grades->groupBy('subject_id');
+
+                $pdf->SetFont('times', '', 11);
+                foreach ($groupedBySubject as $subjectId => $subjectGrades) {
+                    $subject = $subjectGrades->first()->subject;
+                    $mainGrade = $subjectGrades->where('subject_detail_id', null)->first();
+
+                    if ($mainGrade) {
+                        $kkm = $subject->kkm ?? 75;
+                        $pdf->Cell(8, 7, $no++, 1, 0, 'C');
+                        $pdf->Cell(70, 7, $subject->name ?? '-', 1, 0, 'L');
+                        $pdf->Cell(15, 7, $kkm, 1, 0, 'C');
+                        $pdf->Cell(15, 7, $mainGrade->grade, 1, 0, 'C');
+
+                        // Deskripsi singkat
+                        $deskripsi = $getGradeInfo($mainGrade->grade);
+                        $pdf->Cell(72, 7, $deskripsi, 1, 1, 'L');
+                    }
+                }
+            }
+
+            // Tambahkan baris Tahfidz dengan nilai otomatis
+            if ($tahfidzGrades->count() > 0) {
+                $pdf->SetFont('times', 'B', 11);
+                $pdf->SetFillColor(230, 230, 230);
+                $pdf->Cell(180, 7, 'Tahfidz', 1, 1, 'L', true);
+
+                $pdf->SetFont('times', '', 11);
+                $pdf->Cell(8, 7, $no++, 1, 0, 'C');
+                $pdf->Cell(70, 7, 'Tahfidz Al-Qur\'an', 1, 0, 'L');
+                $pdf->Cell(15, 7, '75', 1, 0, 'C');
+                $pdf->Cell(15, 7, $tahfidzAverage, 1, 0, 'C');
+                $pdf->Cell(72, 7, $getGradeInfo($tahfidzAverage), 1, 1, 'L');
+            }
+
+            // Kehadiran (dalam tabel yang sama)
+            $pdf->SetFont('times', 'B', 11);
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->Cell(180, 7, 'Ketidakhadiran', 1, 1, 'L', true);
+
+            $pdf->SetFont('times', '', 11);
+            $pdf->Cell(8, 7, '', 1, 0, 'C');
+            $pdf->Cell(70, 7, 'Sakit', 1, 0, 'L');
+            $pdf->Cell(15, 7, '', 1, 0, 'C');
+            $pdf->Cell(15, 7, $sakitCount == 0 ? '-' : $sakitCount, 1, 0, 'C');
+            $pdf->Cell(72, 7, 'Hari', 1, 1, 'L');
+
+            $pdf->Cell(8, 7, '', 1, 0, 'C');
+            $pdf->Cell(70, 7, 'Izin', 1, 0, 'L');
+            $pdf->Cell(15, 7, '', 1, 0, 'C');
+            $pdf->Cell(15, 7, $izinCount == 0 ? '-' : $izinCount, 1, 0, 'C');
+            $pdf->Cell(72, 7, 'Hari', 1, 1, 'L');
+
+            $pdf->Cell(8, 7, '', 1, 0, 'C');
+            $pdf->Cell(70, 7, 'Tanpa Keterangan', 1, 0, 'L');
+            $pdf->Cell(15, 7, '', 1, 0, 'C');
+            $pdf->Cell(15, 7, $alphaCount == 0 ? '-' : $alphaCount, 1, 0, 'C');
+            $pdf->Cell(72, 7, 'Hari', 1, 1, 'L');
+            // Catatan Wali Kelas (di bawah kehadiran)
+            $pdf->SetFont('times', 'B', 11);
+            $pdf->Cell(180, 7, 'Catatan Wali Kelas', 1, 1, 'L', true);
+
+            $comment = $reportCard->teacher_comment ?? '';
+            $pdf->SetFont('times', '', 11);
+            $pdf->MultiCell(180, 7, $comment, 1, 'L');
+            $pdf->Ln(3);
+
+            // Tanda tangan - Ambil nama wali kelas
+            $homeroomTeacherName = '';
+            if ($student->classModel && $student->classModel->homeroomTeacher) {
+                $homeroomTeacherName = $student->classModel->homeroomTeacher->user->name ?? '';
+            }
+
+            $pdf->SetFont('times', '', 11);
+            $pdf->Cell(60, 5, '', 0, 0, 'C');
+            $pdf->Cell(60, 5, '', 0, 0, 'C');
+            $pdf->Cell(60, 5, 'Lamongan, ' . now()->locale('id')->format('d F Y'), 0, 1, 'C');
+
+            $pdf->Cell(60, 5, 'Wali Kelas', 0, 0, 'C');
+            $pdf->Cell(60, 5, 'Orang Tua/Wali', 0, 0, 'C');
+            $pdf->Cell(60, 5, 'Kepala Madrasah', 0, 1, 'C');
+
+            $pdf->Ln(15);
+
+            $pdf->Cell(60, 5, '( ' . $homeroomTeacherName . ' )', 0, 0, 'C');
+            $pdf->Cell(60, 5, '( ........................... )', 0, 0, 'C');
+            $pdf->Cell(60, 5, '( FU\'AD, M.Pd.I )', 0, 1, 'C');
+        }
+
+        // HALAMAN KEDUA: RAPOR TAHFIDZ (DETAIL)
+        $pdf->AddPage();
+
+        // Header ulang
         $pdf->Image(public_path('img/logo.png'), 22, 2, 38, 38);
 
         $pdf->SetFont('algerian', 'B', 22);
