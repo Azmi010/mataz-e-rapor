@@ -13,9 +13,18 @@ class ReportController extends Controller
     private function formatIndonesianDate($date)
     {
         $months = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
         ];
 
         return $date->format('d') . ' ' . $months[(int)$date->format('m')] . ' ' . $date->format('Y');
@@ -392,7 +401,7 @@ class ReportController extends Controller
         $pdf->SetX(32);
         $pdf->Cell(180, 8, '( Markaz Tahfidz El-Zahro )', 0, 1, 'C');
 
-        $pdf->SetFont('times', '', 10);
+        $pdf->SetFont('times', '', 11);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetX(32);
         $pdf->Cell(180, 5, 'Dsn. Poncol, Ds. Banjarejo, Kec. Karangbinangun, Kab. Lamongan', 0, 1, 'C');
@@ -400,15 +409,15 @@ class ReportController extends Controller
         $pdf->Cell(180, 5, 'HP. 081330578575/081332222366 | Email: markaztahfidzelzahroh@gmail.com', 0, 1, 'C');
 
         $pdf->SetDrawColor(0, 0, 0);
-        $pdf->SetLineWidth(0.3);
-        $pdf->Line(15, 38, 195, 38);
-        $pdf->SetLineWidth(1.2);
-        $pdf->Line(15, 39, 195, 39);
-        $pdf->SetLineWidth(0.3);
+        $pdf->SetLineWidth(0.2);
+        $pdf->Line(14.8, 38, 195.2, 38);
+        $pdf->SetLineWidth(0.7);
+        $pdf->Line(15, 38.7, 195, 38.7);
+        $pdf->SetLineWidth(0.2);
 
         $pdf->Ln(3);
 
-        $pdf->SetFont('freeserif', 'B', 20);
+        $pdf->SetFont('freeserif', 'B', 16);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->Cell(0, 10, 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', 0, 1, 'C');
 
@@ -418,47 +427,52 @@ class ReportController extends Controller
         $pdf->Cell(0, 8, 'TRANSKRIP NILAI AKHIR LEVEL', 0, 1, 'C', true);
         $pdf->SetTextColor(0, 0, 0);
 
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $y_start = $pdf->GetY() + 4;
 
         $pdf->SetXY(15, $y_start);
         $pdf->Cell(35, 6, 'Nama', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(70, 6, $student->user->name ?? '-', 0, 0, 'L');
 
         $pdf->SetXY(15, $y_start + 7);
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(35, 6, 'No. Induk', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(70, 6, $student->nis ?? '-', 0, 0, 'L');
 
         $pdf->SetXY(15, $y_start + 14);
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(35, 6, 'Kelas/Level', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(70, 6, $student->classModel->name ?? '-', 0, 0, 'L');
 
         $pdf->SetXY(15, $y_start + 21);
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(35, 6, 'Alamat', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(70, 6, $student->address ?? '-', 0, 0, 'L');
 
         $pdf->SetXY(15, $y_start + 28);
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(35, 6, 'Wali Murid', 0, 0, 'L');
         $pdf->Cell(5, 6, ':', 0, 0, 'C');
-        $pdf->SetFont('times', '', 13);
+        $pdf->SetFont('times', '', 12);
         $pdf->Cell(70, 6, $student->wali ?? '-', 0, 0, 'L');
 
         $pdf->SetY($y_start + 40);
 
         if ($reportCard && $reportCard->grades->count() > 0) {
-            $groupedGrades = $reportCard->grades->groupBy('subject_id');
+            // Filter hanya grades dari subject yang is_tahfidz = true
+            $tahfidzGrades = $reportCard->grades->filter(function ($grade) {
+                return $grade->subject && $grade->subject->is_tahfidz;
+            });
+
+            $groupedGrades = $tahfidzGrades->groupBy('subject_id');
             $juz30Grades = null;
             $juz29Grades = null;
             $otherGrades = collect();
@@ -491,14 +505,14 @@ class ReportController extends Controller
             if ($juz30Grades) {
 
                 $pdf->SetTextColor(0, 0, 0);
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
 
                 $pdf->Cell(45, 8, 'Obyek Penilaian', 1, 0, 'C');
                 $pdf->Cell(45, 8, 'Nilai', 1, 0, 'C');
                 $pdf->Cell(45, 8, 'Obyek Penilaian', 1, 0, 'C');
                 $pdf->Cell(45, 8, 'Nilai', 1, 1, 'C');
 
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(45, 6, 'Juz 30', 1, 0, 'C');
                 $pdf->Cell(15, 6, 'Angka', 1, 0, 'C');
                 $pdf->Cell(30, 6, 'Keterangan', 1, 0, 'C');
@@ -517,10 +531,10 @@ class ReportController extends Controller
                 $halfCount = ceil($totalGrades / 2);
 
                 $getGradeInfo = function ($gradeValue) {
-                    if ($gradeValue >= 95) return ['Istimewa', [144, 238, 144]];
-                    if ($gradeValue >= 85) return ['Sangat Baik', [173, 216, 230]];
-                    if ($gradeValue >= 75) return ['Baik', [255, 255, 224]];
-                    if ($gradeValue >= 65) return ['Cukup', [255, 228, 196]];
+                    if ($gradeValue == 100) return ['Istimewa', [144, 238, 144]];
+                    if ($gradeValue >= 90) return ['Sangat Baik', [144, 238, 144]];
+                    if ($gradeValue >= 80) return ['Baik', [173, 216, 230]];
+                    if ($gradeValue >= 70) return ['Cukup', [255, 255, 224]];
                     return ['Kurang', [255, 182, 193]];
                 };
 
@@ -535,13 +549,13 @@ class ReportController extends Controller
                             ? trim($matches[1])
                             : $leftSurahName;
 
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(10, 6, ($i + 1), 1, 0, 'C', true);
-                        $pdf->SetFont('freeserif', '', 13);
+                        $pdf->SetFont('freeserif', '', 12);
                         $pdf->Cell(35, 6, $leftArabicName, 1, 0, 'C', true);
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(15, 6, $leftGradeValue, 1, 0, 'C', true);
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(30, 6, $leftGradeInfo[0], 1, 0, 'C', true);
                     } else {
                         $pdf->SetFillColor(255, 255, 255);
@@ -562,13 +576,13 @@ class ReportController extends Controller
                             ? trim($matches[1])
                             : $rightSurahName;
 
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(10, 6, ($rightIndex + 1), 1, 0, 'C', true);
-                        $pdf->SetFont('freeserif', '', 13);
+                        $pdf->SetFont('freeserif', '', 12);
                         $pdf->Cell(35, 6, $rightArabicName, 1, 0, 'C', true);
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(15, 6, $rightGradeValue, 1, 0, 'C', true);
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(30, 6, $rightGradeInfo[0], 1, 1, 'C', true);
                     } else {
                         $pdf->SetFillColor(255, 255, 255);
@@ -588,14 +602,14 @@ class ReportController extends Controller
                 $rataRata = count($juz30Array) > 0 ? round($totalNilai / count($juz30Array), 1) : 0;
 
                 $pdf->SetFillColor(255, 255, 255);
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Total Nilai', 1, 0, 'L', true);
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $totalNilai, 1, 1, 'L', true);
 
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Rata-rata', 1, 0, 'L', true);
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $rataRata, 1, 1, 'L', true);
 
                 $pdf->SetFillColor(0, 0, 0);
@@ -606,7 +620,7 @@ class ReportController extends Controller
 
             if ($juz29Grades) {
                 $pdf->SetTextColor(0, 0, 0);
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
 
                 $pdf->Cell(45, 8, 'Obyek Penilaian', 1, 0, 'C');
                 $pdf->Cell(45, 8, 'Nilai', 1, 0, 'C');
@@ -631,10 +645,10 @@ class ReportController extends Controller
                 $halfCount = ceil($totalGrades / 2);
 
                 $getGradeInfo = function ($gradeValue) {
-                    if ($gradeValue >= 95) return ['Istimewa', [144, 238, 144]];
-                    if ($gradeValue >= 85) return ['Sangat Baik', [173, 216, 230]];
-                    if ($gradeValue >= 75) return ['Baik', [255, 255, 224]];
-                    if ($gradeValue >= 65) return ['Cukup', [255, 228, 196]];
+                    if ($gradeValue == 100) return ['Istimewa', [144, 238, 144]];
+                    if ($gradeValue >= 90) return ['Sangat Baik', [144, 238, 144]];
+                    if ($gradeValue >= 80) return ['Baik', [173, 216, 230]];
+                    if ($gradeValue >= 70) return ['Cukup', [255, 255, 224]];
                     return ['Kurang', [255, 182, 193]];
                 };
 
@@ -649,11 +663,11 @@ class ReportController extends Controller
                             ? trim($matches[1])
                             : $leftSurahName;
 
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(10, 6, ($i + 1), 1, 0, 'C');
-                        $pdf->SetFont('freeserif', '', 13);
+                        $pdf->SetFont('freeserif', '', 12);
                         $pdf->Cell(35, 6, $leftArabicName, 1, 0, 'C');
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(15, 6, $leftGradeValue, 1, 0, 'C');
                         $pdf->Cell(30, 6, $leftGradeInfo[0], 1, 0, 'C');
                     } else {
@@ -676,9 +690,9 @@ class ReportController extends Controller
                             : $rightSurahName;
 
                         $pdf->Cell(10, 6, ($rightIndex + 1), 1, 0, 'C');
-                        $pdf->SetFont('freeserif', '', 13);
+                        $pdf->SetFont('freeserif', '', 12);
                         $pdf->Cell(35, 6, $rightArabicName, 1, 0, 'C');
-                        $pdf->SetFont('times', '', 13);
+                        $pdf->SetFont('times', '', 12);
                         $pdf->Cell(15, 6, $rightGradeValue, 1, 0, 'C');
                         $pdf->Cell(30, 6, $rightGradeInfo[0], 1, 1, 'C');
                     } else {
@@ -699,14 +713,14 @@ class ReportController extends Controller
                 $rataRata = count($juz29Array) > 0 ? round($totalNilai / count($juz29Array), 1) : 0;
 
                 $pdf->SetFillColor(255, 255, 255);
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Total Nilai', 1, 0, 'L', true);
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $totalNilai, 1, 1, 'L', true);
 
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Rata-rata', 1, 0, 'L', true);
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $rataRata, 1, 1, 'L', true);
 
                 $pdf->SetFillColor(0, 0, 0);
@@ -715,6 +729,7 @@ class ReportController extends Controller
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
             }
 
+            // Tampilkan bagian "Obyek Penilaian Per Juz" jika ada other grades
             if ($otherGrades->count() > 0) {
                 $allOtherDetailGrades = collect();
                 $allOtherMainGrades = collect();
@@ -737,7 +752,7 @@ class ReportController extends Controller
                 $startY = $pdf->GetY();
 
                 $pdf->SetTextColor(0, 0, 0);
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
 
                 $pdf->SetXY(15, $startY);
                 $pdf->Cell(90, 14, 'Obyek Penilaian Per Juz', 1, 0, 'C');
@@ -752,22 +767,22 @@ class ReportController extends Controller
                 $pdf->SetY($startY + 14);
 
                 $getGradeInfo = function ($gradeValue) {
-                    if ($gradeValue >= 95) return ['Istimewa', [144, 238, 144]];
-                    if ($gradeValue >= 85) return ['Sangat baik', [173, 216, 230]];
-                    if ($gradeValue >= 75) return ['Baik', [255, 255, 224]];
-                    if ($gradeValue >= 65) return ['Cukup', [255, 228, 196]];
+                    if ($gradeValue == 100) return ['Istimewa', [144, 238, 144]];
+                    if ($gradeValue >= 90) return ['Sangat Baik', [144, 238, 144]];
+                    if ($gradeValue >= 80) return ['Baik', [173, 216, 230]];
+                    if ($gradeValue >= 70) return ['Cukup', [255, 255, 224]];
                     return ['Kurang', [255, 182, 193]];
                 };
 
-                $pdf->SetFont('freeserif', '', 13);
+                $pdf->SetFont('freeserif', '', 12);
                 foreach ($otherGrades as $subjectId => $grades) {
                     $subject = $grades->first()->subject;
                     $mainGrade = $grades->where('subject_detail_id', null)->first();
                     $gradeInfo = $getGradeInfo($mainGrade ? $mainGrade->grade : 0);
 
-                    $pdf->SetFont('freeserif', '', 13);
+                    $pdf->SetFont('freeserif', '', 12);
                     $pdf->Cell(90, 7, strtoupper($subject->name), 1, 0, 'L');
-                    $pdf->SetFont('times', '', 13);
+                    $pdf->SetFont('times', '', 12);
                     $pdf->Cell(45, 7, $mainGrade ? $mainGrade->grade : '-', 1, 0, 'C');
                     $pdf->Cell(45, 7, $gradeInfo[0], 1, 1, 'C');
                 }
@@ -777,91 +792,98 @@ class ReportController extends Controller
                 $pdf->Cell(45, 6, '', 1, 0, 'C', true);
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
 
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Total Nilai', 1, 0, 'L');
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $totalOtherGrades, 1, 1, 'L');
 
-                $pdf->SetFont('times', '', 13);
+                $pdf->SetFont('times', '', 12);
                 $pdf->Cell(90, 7, 'Rata-rata', 1, 0, 'L');
-                $pdf->SetFont('times', 'B', 13);
+                $pdf->SetFont('times', 'B', 12);
                 $pdf->Cell(90, 7, $averageOtherGrades, 1, 1, 'L');
 
                 $pdf->SetFillColor(0, 0, 0);
                 $pdf->Cell(90, 6, '', 1, 0, 'C', true);
                 $pdf->Cell(45, 6, '', 1, 0, 'C', true);
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
-
-                $pdf->SetFillColor(255, 255, 255);
-                $pdf->SetFont('times', 'B', 13);
-                $pdf->Cell(90, 7, 'Total Nilai Keseluruhan', 1, 0, 'L', true);
-                $pdf->Cell(90, 7, $totalScore, 1, 1, 'L', true);
-
-                $pdf->Cell(90, 7, 'Rata-rata Keseluruhan', 1, 0, 'L', true);
-                $pdf->Cell(90, 7, $averageScore, 1, 1, 'L', true);
-
-                $pdf->SetFont('times', '', 13);
-                $pdf->Cell(180, 7, 'Absensi Kehadiran', 1, 1, 'L', true);
-
-                $pdf->Cell(90, 6, 'Izin', 1, 0, 'L', true);
-                $pdf->Cell(45, 6, $izinCount == 0 ? '-' : $izinCount, 1, 0, 'C', true);
-                $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
-
-                $pdf->Cell(90, 6, 'Sakit', 1, 0, 'L', true);
-                $pdf->Cell(45, 6, $sakitCount == 0 ? '-' : $sakitCount, 1, 0, 'C', true);
-                $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
-
-                $pdf->Cell(90, 6, 'Absen', 1, 0, 'L', true);
-                $pdf->Cell(45, 6, $alphaCount == 0 ? '-' : $alphaCount, 1, 0, 'C', true);
-                $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
-
-                $pdf->Cell(90, 6, 'Jumlah', 1, 0, 'L', true);
-                $pdf->Cell(45, 6, $totalAbsent == 0 ? '-' : $totalAbsent, 1, 0, 'C', true);
-                $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
-
-                $pdf->SetFillColor(0, 0, 0);
-                $pdf->Cell(90, 6, '', 1, 0, 'C', true);
-                $pdf->Cell(45, 6, '', 1, 0, 'C', true);
-                $pdf->Cell(45, 6, '', 1, 1, 'C', true);
-
-                $pdf->Cell(90, 7, 'Keterangan Kelulusan', 1, 0, 'L');
-                $pdf->Cell(90, 7, '', 1, 1, 'L');
-
-                $comment = $reportCard->teacher_comment ?? '-';
-                $pdf->SetFont('times', '', 13);
-
-                $y = $pdf->GetY();
-                $pdf->SetXY(15, $y);
-
-                $pdf->Rect(15, $y, 180, 15);
-                $pdf->SetXY(15, $y + 2);
-                $pdf->MultiCell(176, 4, 'Pesan Fasilitator:' . "\n" . $comment, 0, 'L');
-
-                $pdf->SetY($y + 17);
-
-                $pdf->Ln(3);
             }
+
+            // Hitung total nilai dari semua grades tahfidz
+            $totalTahfidzScore = $tahfidzGrades->sum('grade');
+            $totalTahfidzGrades = $tahfidzGrades->count();
+            $averageTahfidzScore = $totalTahfidzGrades > 0 ? round($totalTahfidzScore / $totalTahfidzGrades, 1) : 0;
+
+            // Total Nilai Keseluruhan dan Absensi (selalu ditampilkan)
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->SetFont('times', 'B', 12);
+            $pdf->Cell(90, 7, 'Total Nilai Keseluruhan', 1, 0, 'L', true);
+            $pdf->Cell(90, 7, $totalTahfidzScore, 1, 1, 'L', true);
+
+            $pdf->Cell(90, 7, 'Rata-rata Keseluruhan', 1, 0, 'L', true);
+            $pdf->Cell(90, 7, $averageTahfidzScore, 1, 1, 'L', true);
+
+            $pdf->SetFont('times', '', 12);
+            $pdf->Cell(180, 7, 'Absensi Kehadiran', 1, 1, 'L', true);
+
+            $pdf->Cell(90, 6, 'Izin', 1, 0, 'L', true);
+            $pdf->Cell(45, 6, $izinCount == 0 ? '-' : $izinCount, 1, 0, 'C', true);
+            $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
+
+            $pdf->Cell(90, 6, 'Sakit', 1, 0, 'L', true);
+            $pdf->Cell(45, 6, $sakitCount == 0 ? '-' : $sakitCount, 1, 0, 'C', true);
+            $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
+
+            $pdf->Cell(90, 6, 'Absen', 1, 0, 'L', true);
+            $pdf->Cell(45, 6, $alphaCount == 0 ? '-' : $alphaCount, 1, 0, 'C', true);
+            $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
+
+            $pdf->Cell(90, 6, 'Jumlah', 1, 0, 'L', true);
+            $pdf->Cell(45, 6, $totalAbsent == 0 ? '-' : $totalAbsent, 1, 0, 'C', true);
+            $pdf->Cell(45, 6, 'Hari', 1, 1, 'L', true);
+
+            $pdf->SetFillColor(0, 0, 0);
+            $pdf->Cell(90, 6, '', 1, 0, 'C', true);
+            $pdf->Cell(45, 6, '', 1, 0, 'C', true);
+            $pdf->Cell(45, 6, '', 1, 1, 'C', true);
+
+            $pdf->Cell(90, 7, 'Keterangan Kelulusan', 1, 0, 'L');
+            $pdf->Cell(90, 7, '', 1, 1, 'L');
+
+            $comment = $reportCard->teacher_comment ?? '-';
+            $pdf->SetFont('times', '', 12);
+
+            $y = $pdf->GetY();
+            $pdf->SetXY(15, $y);
+
+            $pdf->Rect(15, $y, 180, 15);
+            $pdf->SetXY(15, $y + 2);
+            $pdf->MultiCell(176, 4, 'Pesan Fasilitator:' . "\n" . $comment, 0, 'L');
+
+            $pdf->SetY($y + 17);
+
+            $pdf->Ln(3);
         }
 
         $pdf->Ln(6);
-        $pdf->SetFont('times', '', 13);
+        $homeroomTeacherName = '';
+        if ($student->classModel && $student->classModel->homeroomTeacher) {
+            $homeroomTeacherName = $student->classModel->homeroomTeacher->user->name ?? '';
+        }
 
-        $pdf->Cell(110, 6, '', 0, 0, 'C');
-        $pdf->Cell(90, 6, 'Lamongan, ' . $this->formatIndonesianDate(now()), 0, 1, 'L');
-        $pdf->Ln(3);
+        $pdf->SetFont('times', '', 12);
+        $pdf->Cell(60, 5, '', 0, 0, 'C');
+        $pdf->Cell(60, 5, '', 0, 0, 'C');
+        $pdf->Cell(60, 5, 'Lamongan, ' . $this->formatIndonesianDate(now()), 0, 1, 'C');
 
-        $signatureStartY = $pdf->GetY();
-
-        $pdf->Cell(90, 6, 'Wali Murid', 0, 0, 'C');
-        $pdf->Cell(90, 6, 'Ketua MATAZ El Zahroh', 0, 1, 'C');
-
-        $pdf->Image(public_path('img/ttd-mataz.png'), 123, $pdf->GetY() + 1, 35, 35);
+        $pdf->Cell(60, 5, 'Wali Kelas', 0, 0, 'C');
+        $pdf->Cell(60, 5, 'Orang Tua/Wali', 0, 0, 'C');
+        $pdf->Cell(60, 5, 'Kepala Madrasah', 0, 1, 'C');
 
         $pdf->Ln(20);
 
-        $pdf->SetFont('times', '', 13);
-        $pdf->Cell(90, 6, '( .................................. )', 0, 0, 'C');
-        $pdf->Cell(90, 6, '( FU\'AD, M.Pd.I )', 0, 1, 'C');
+        $pdf->Cell(60, 5, '( ' . $homeroomTeacherName . ' )', 0, 0, 'C');
+        $pdf->Cell(60, 5, '( ........................... )', 0, 0, 'C');
+        $pdf->Cell(60, 5, '( FU\'AD, M.Pd.I )', 0, 1, 'C');
 
         $filename = 'Rapor_' . str_replace([' ', '.', ','], '_', $student->user->name) . '_' . now()->format('Y-m-d') . '.pdf';
 
