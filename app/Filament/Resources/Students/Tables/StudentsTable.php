@@ -9,6 +9,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
+use App\Models\Semester;
+use App\Models\ReportCard;
 
 class StudentsTable
 {
@@ -21,7 +23,7 @@ class StudentsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.name')
-                    ->label('Nama Siswa')
+                    ->label('Nama')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.email')
@@ -34,15 +36,29 @@ class StudentsTable
                     ->default('Belum ada kelas')
                     ->badge()
                     ->color(fn ($state) => $state === 'Belum ada kelas' ? 'gray' : 'success'),
-                TextColumn::make('wali')
-                    ->label('Nama Wali')
-                    ->searchable()
-                    ->toggleable(),
-                TextColumn::make('created_at')
-                    ->label('Terdaftar')
-                    ->dateTime('d M Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('status_nilai')
+                    ->label('Nilai')
+                    ->badge()
+                    ->state(function ($record) {
+                        $currentSemester = Semester::whereDate('start_date', '<=', now())
+                            ->whereDate('end_date', '>=', now())
+                            ->first();
+
+                        if (!$currentSemester) {
+                            return 'Tidak ada semester aktif';
+                        }
+
+                        $hasReportCard = ReportCard::where('student_id', $record->id)
+                            ->where('semester_id', $currentSemester->id)
+                            ->exists();
+
+                        return $hasReportCard ? 'Sudah Dinilai' : 'Belum Dinilai';
+                    })
+                    ->color(fn ($state) => match($state) {
+                        'Sudah Dinilai' => 'success',
+                        'Belum Dinilai' => 'warning',
+                        default => 'gray'
+                    }),
             ])
             ->filters([
                 SelectFilter::make('class_id')
