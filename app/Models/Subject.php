@@ -20,12 +20,16 @@ class Subject extends Model
 
     public function classes(): BelongsToMany
     {
-        return $this->belongsToMany(ClassModel::class, 'class_subjects', 'subject_id', 'class_model_id');
+        return $this->belongsToMany(ClassModel::class, 'class_subjects', 'subject_id', 'class_model_id')
+            ->withPivot('teacher_id')
+            ->withTimestamps();
     }
 
     public function classModels(): BelongsToMany
     {
-        return $this->belongsToMany(ClassModel::class, 'class_subjects', 'subject_id', 'class_model_id');
+        return $this->belongsToMany(ClassModel::class, 'class_subjects', 'subject_id', 'class_model_id')
+            ->withPivot('teacher_id')
+            ->withTimestamps();
     }
 
     public function details(): HasMany
