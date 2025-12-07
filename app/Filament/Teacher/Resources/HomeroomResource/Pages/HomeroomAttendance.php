@@ -96,7 +96,7 @@ class HomeroomAttendance extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('gender')
                     ->label('L/P')
-                    ->formatStateUsing(fn (string $state): string => $state === 'male' ? 'L' : 'P'),
+                    ->formatStateUsing(fn (string $state): string => $state === 'L' ? 'L' : 'P'),
                 SelectColumn::make('attendance')
                     ->label('Kehadiran')
                     ->options([
