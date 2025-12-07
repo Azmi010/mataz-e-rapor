@@ -26,15 +26,7 @@ class SubjectClassResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $subjectId = request()->route('subject');
-        $classId = request()->route('class');
-
         return $table
-            ->heading(function () use ($subjectId, $classId) {
-                $subject = Subject::find($subjectId);
-                $class = ClassModel::find($classId);
-                return "Daftar Siswa - {$subject?->name} - Kelas {$class?->name}";
-            })
             ->columns([
                 TextColumn::make('no')
                     ->label('No')
@@ -52,7 +44,9 @@ class SubjectClassResource extends Resource
                     ->formatStateUsing(fn (string $state): string => $state === 'L' ? 'L' : 'P'),
                 TextColumn::make('score')
                     ->label('Nilai')
-                    ->state(function (Student $record) use ($subjectId) {
+                    ->state(function (Student $record) {
+                        $subjectId = request()->route('subject');
+
                         $semester = Semester::whereDate('start_date', '<=', now())
                             ->whereDate('end_date', '>=', now())
                             ->first();
