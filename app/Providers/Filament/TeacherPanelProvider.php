@@ -125,6 +125,33 @@ class TeacherPanelProvider extends PanelProvider
                                 ->collapsible();
                         }
 
+                        $homeroomClass = ClassModel::where('homeroom_teacher_id', $teacher->id)->first();
+
+                        if ($homeroomClass) {
+                            $homeroomItems = [
+                                NavigationItem::make('Data Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.students'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.students')),
+                                NavigationItem::make('Absen Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.attendance'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.attendance')),
+                                NavigationItem::make('Catatan Wali Kelas')
+                                    ->url(route('filament.teacher.resources.homeroom.notes'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.notes')),
+                                NavigationItem::make('Prestasi')
+                                    ->url(route('filament.teacher.resources.homeroom.achievements'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.achievements')),
+                                NavigationItem::make('Rapor Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.reports'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.reports')),
+                            ];
+
+                            $groups[] = NavigationGroup::make('Wali Kelas')
+                                ->items($homeroomItems)
+                                ->icon('heroicon-o-user-group')
+                                ->collapsible();
+                        }
+
                         $builder->groups($groups);
                     }
                 }
