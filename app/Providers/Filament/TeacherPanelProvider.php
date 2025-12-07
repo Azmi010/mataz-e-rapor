@@ -91,6 +91,7 @@ class TeacherPanelProvider extends PanelProvider
                             ->join('subjects', 'class_subjects.subject_id', '=', 'subjects.id')
                             ->join('class_models', 'class_subjects.class_model_id', '=', 'class_models.id')
                             ->where('class_subjects.teacher_id', $teacher->id)
+                            ->where('subjects.is_tahfidz', false)
                             ->select(
                                 'subjects.id as subject_id',
                                 'subjects.name as subject_name',
