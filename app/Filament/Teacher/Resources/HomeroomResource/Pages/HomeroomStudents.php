@@ -79,7 +79,18 @@ class HomeroomStudents extends Page implements HasTable
                     }),
                 TextColumn::make('ttl')->label('TTL')->state(function (Student $record) {
                     if (!$record->birth_place || !$record->birth_date) return '-';
-                    return $record->birth_place . ', ' . $record->birth_date->format('d/m/Y');
+
+                    $months = [
+                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                    ];
+
+                    $day = $record->birth_date->format('d');
+                    $month = $months[(int)$record->birth_date->format('m')];
+                    $year = $record->birth_date->format('Y');
+
+                    return $record->birth_place . ', ' . $day . ' ' . $month . ' ' . $year;
                 }),
             ])
             ->recordActions([
