@@ -72,4 +72,9 @@ class Student extends Model
     {
         return $this->hasMany(ReportCard::class);
     }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(Achievement::class);
+    }
 }
