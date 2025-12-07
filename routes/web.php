@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RecapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +25,7 @@ Route::get('/dashboard', function () {
 Route::get('/teacher/grading/{student}/rapor-pdf', [ReportController::class, 'generateReport'])
     ->name('rapor.pdf');
 
-// Named route untuk login redirect - diperlukan oleh Laravel auth middleware
-// Filament sudah menangani /login, route ini hanya untuk named route reference
+Route::get('/teacher/grading/{student}/rekap-pdf', [RecapController::class, 'generateRecap'])
+    ->name('rekap.pdf');
+
 Route::redirect('/auth/login', '/login')->name('login');

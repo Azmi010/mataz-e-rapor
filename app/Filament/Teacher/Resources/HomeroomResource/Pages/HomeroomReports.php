@@ -96,13 +96,8 @@ class HomeroomReports extends Page implements HasTable
                     ->icon('heroicon-o-clipboard-document-list')
                     ->color('info')
                     ->button()
-                    ->action(function (Student $record) {
-                        Notification::make()
-                            ->title('Fitur Rekap')
-                            ->body('Fitur ini akan segera tersedia')
-                            ->info()
-                            ->send();
-                    }),
+                    ->url(fn (Student $record): string => route('rekap.pdf', ['student' => $record->id]))
+                    ->openUrlInNewTab(),
                 ActionGroup::make([
                     Action::make('sampul')
                         ->label('Sampul')
