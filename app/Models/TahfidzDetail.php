@@ -12,13 +12,17 @@ class TahfidzDetail extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'grade' => 'integer',
+    ];
+
     public function reportCard(): BelongsTo
     {
         return $this->belongsTo(ReportCard::class);
     }
 
-    public function subject(): BelongsTo
+    public function tahfidz(): BelongsTo
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Tahfidz::class);
     }
 }

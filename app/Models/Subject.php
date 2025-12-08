@@ -13,11 +13,6 @@ class Subject extends Model
     use HasFactory;
     protected $guarded = [];
 
-    protected $casts = [
-        'is_tahfidz' => 'boolean',
-        'has_details' => 'boolean',
-    ];
-
     public function classes(): BelongsToMany
     {
         return $this->belongsToMany(ClassModel::class, 'class_subjects', 'subject_id', 'class_model_id')
@@ -40,10 +35,5 @@ class Subject extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(SubjectCategory::class, 'category_id');
-    }
-
-    public function isTahfidz(): bool
-    {
-        return $this->is_tahfidz === true;
     }
 }
