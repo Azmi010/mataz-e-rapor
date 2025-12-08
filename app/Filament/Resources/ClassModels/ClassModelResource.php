@@ -7,6 +7,7 @@ use App\Filament\Resources\ClassModels\Pages\EditClassModel;
 use App\Filament\Resources\ClassModels\Pages\ListClassModels;
 use App\Filament\Resources\ClassModels\RelationManagers\StudentsRelationManager;
 use App\Filament\Resources\ClassModels\RelationManagers\SubjectsRelationManager;
+use App\Filament\Resources\ClassModels\RelationManagers\TahfidzRelationManager;
 use App\Filament\Resources\ClassModels\Schemas\ClassModelForm;
 use App\Filament\Resources\ClassModels\Tables\ClassModelsTable;
 use App\Models\ClassModel;
@@ -50,6 +51,7 @@ class ClassModelResource extends Resource
         return [
             StudentsRelationManager::class,
             SubjectsRelationManager::class,
+            TahfidzRelationManager::class,
         ];
     }
 

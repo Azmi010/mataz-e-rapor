@@ -22,4 +22,10 @@ class Tahfidz extends Model
     {
         return $this->hasMany(TahfidzDetail::class);
     }
+
+    public function classModels()
+    {
+        return $this->belongsToMany(ClassModel::class, 'class_tahfidz', 'tahfidz_id', 'class_model_id')
+            ->withTimestamps();
+    }
 }

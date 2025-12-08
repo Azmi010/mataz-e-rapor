@@ -26,6 +26,12 @@ class ClassModel extends Model
             ->withTimestamps();
     }
 
+    public function tahfidz(): BelongsToMany
+    {
+        return $this->belongsToMany(Tahfidz::class, 'class_tahfidz', 'class_model_id', 'tahfidz_id')
+            ->withTimestamps();
+    }
+
     public function students(): HasMany
     {
         return $this->hasMany(Student::class, 'class_id');

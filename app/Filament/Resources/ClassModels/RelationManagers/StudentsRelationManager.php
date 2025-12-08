@@ -15,6 +15,7 @@ class StudentsRelationManager extends RelationManager
     protected static string $relationship = 'students';
     protected static ?string $modelLabel = 'Siswa';
     protected static ?string $pluralModelLabel = 'Siswa';
+    protected static ?string $title = 'Siswa';
 
     public function form(Schema $schema): Schema
     {
@@ -68,7 +69,7 @@ class StudentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
+                AttachAction::make()
                     ->label('Tambah Siswa'),
             ])
             ->actions([

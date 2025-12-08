@@ -5,7 +5,6 @@ namespace App\Filament\Resources\ClassModels\RelationManagers;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\AttachAction;
@@ -20,6 +19,7 @@ class SubjectsRelationManager extends RelationManager
     protected static string $relationship = 'subjects';
     protected static ?string $modelLabel = 'Mata Pelajaran';
     protected static ?string $pluralModelLabel = 'Mata Pelajaran';
+    protected static ?string $title = 'Mata Pelajaran';
 
     public function form(Schema $schema): Schema
     {
@@ -86,7 +86,7 @@ class SubjectsRelationManager extends RelationManager
             ->recordActions([
                 Action::make('edit_teacher')
                     ->label('Edit')
-                    ->icon('heroicon-o-pencil')
+                    ->icon('heroicon-o-pencil-square')
                     ->form([
                         Forms\Components\Select::make('teacher_id')
                             ->label('Guru Pengajar')
@@ -105,7 +105,8 @@ class SubjectsRelationManager extends RelationManager
                     ->modalHeading('Edit Guru Pengajar')
                     ->modalSubmitActionLabel('Simpan'),
                 DetachAction::make()
-                    ->label('Hapus'),
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
