@@ -138,7 +138,10 @@ class ReportController extends Controller
         }
 
         $pdf->SetCreator('MATAZ El Zahro');
+        $pdf->SetAuthor('MI Tahfidz El-Zahro');
         $pdf->SetTitle('Rapor ' . $student->user->name);
+        $pdf->SetSubject('Rapor Siswa');
+        $pdf->SetKeywords('Rapor, MATAZ, El-Zahro, Siswa');
 
         $pdf->SetMargins(15, 15, 15);
         $pdf->setPrintHeader(false);
@@ -466,43 +469,31 @@ class ReportController extends Controller
 
         $pdf->SetY($y_start + 40);
 
-        if ($reportCard && $reportCard->grades->count() > 0) {
-            // Filter hanya grades dari subject yang is_tahfidz = true
-            $tahfidzGrades = $reportCard->grades->filter(function ($grade) {
-                return $grade->subject && $grade->subject->is_tahfidz;
-            });
+        $tahfidzDetails = $reportCard ? $reportCard->tahfidzDetails()->with('tahfidz')->get() : collect();
 
-            $groupedGrades = $tahfidzGrades->groupBy('subject_id');
-            $juz30Grades = null;
-            $juz29Grades = null;
+        if ($tahfidzDetails->count() > 0) {
+            $juz30Grades = collect();
+            $juz29Grades = collect();
             $otherGrades = collect();
 
-            $sortedGrades = $groupedGrades->sortBy(function ($grades) {
-                $subject = $grades->first()->subject;
-                $name = strtolower($subject->name);
-                if (str_contains($name, 'juz 30')) return 1;
-                if (str_contains($name, 'juz 29')) return 2;
-                if (str_contains($name, 'juz ')) {
-                    if (preg_match('/juz (\d+)/', $name, $matches)) {
-                        return 100 + (int) $matches[1];
-                    }
-                    return 999;
-                }
-                return 1000;
-            });
-
-            foreach ($sortedGrades as $subjectId => $grades) {
-                $subject = $grades->first()->subject;
-                if (str_contains(strtolower($subject->name), 'juz 30')) {
-                    $juz30Grades = $grades;
-                } elseif (str_contains(strtolower($subject->name), 'juz 29')) {
-                    $juz29Grades = $grades;
+            foreach ($tahfidzDetails as $detail) {
+                $tahfidz = $detail->tahfidz;
+                if ($tahfidz->juz == 30) {
+                    $juz30Grades->push($detail);
+                } elseif ($tahfidz->juz == 29) {
+                    $juz29Grades->push($detail);
                 } else {
-                    $otherGrades->put($subjectId, $grades);
+                    $juzNumber = $tahfidz->juz ?? 0;
+                    if (!$otherGrades->has($juzNumber)) {
+                        $otherGrades->put($juzNumber, collect());
+                    }
+                    $otherGrades->get($juzNumber)->push($detail);
                 }
             }
 
-            if ($juz30Grades) {
+            $otherGrades = $otherGrades->sortKeys();
+
+            if ($juz30Grades->count() > 0) {
 
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->SetFont('times', '', 12);
@@ -520,12 +511,9 @@ class ReportController extends Controller
                 $pdf->Cell(15, 6, 'Angka', 1, 0, 'C');
                 $pdf->Cell(30, 6, 'Keterangan', 1, 1, 'C');
 
-                $juz30Array = [];
-                foreach ($juz30Grades as $grade) {
-                    if ($grade->subject_detail_id) {
-                        $juz30Array[] = $grade;
-                    }
-                }
+                $juz30Array = $juz30Grades->sortBy(function($detail) {
+                    return $detail->tahfidz->id;
+                })->values()->all();
 
                 $totalGrades = count($juz30Array);
                 $halfCount = ceil($totalGrades / 2);
@@ -543,11 +531,15 @@ class ReportController extends Controller
                         $leftGrade = $juz30Array[$i];
                         $leftGradeValue = $leftGrade->grade;
                         $leftGradeInfo = $getGradeInfo($leftGradeValue);
-                        $leftSurahName = $leftGrade->subjectDetail->name ?? '-';
+                        $leftSurahName = $leftGrade->tahfidz->name ?? '-';
 
-                        $leftArabicName = preg_match('/^([^\(]+)/', $leftSurahName, $matches)
-                            ? trim($matches[1])
-                            : $leftSurahName;
+                        if ($leftGrade->tahfidz->arabic_name) {
+                            $leftArabicName = $leftGrade->tahfidz->arabic_name;
+                        } elseif (preg_match('/^([^\(]+)/', $leftSurahName, $matches)) {
+                            $leftArabicName = trim($matches[1]);
+                        } else {
+                            $leftArabicName = $leftSurahName;
+                        }
 
                         $pdf->SetFont('times', '', 12);
                         $pdf->Cell(10, 6, ($i + 1), 1, 0, 'C', true);
@@ -570,11 +562,15 @@ class ReportController extends Controller
                         $rightGrade = $juz30Array[$rightIndex];
                         $rightGradeValue = $rightGrade->grade;
                         $rightGradeInfo = $getGradeInfo($rightGradeValue);
-                        $rightSurahName = $rightGrade->subjectDetail->name ?? '-';
+                        $rightSurahName = $rightGrade->tahfidz->name ?? '-';
 
-                        $rightArabicName = preg_match('/^([^\(]+)/', $rightSurahName, $matches)
-                            ? trim($matches[1])
-                            : $rightSurahName;
+                        if ($rightGrade->tahfidz->arabic_name) {
+                            $rightArabicName = $rightGrade->tahfidz->arabic_name;
+                        } elseif (preg_match('/^([^\(]+)/', $rightSurahName, $matches)) {
+                            $rightArabicName = trim($matches[1]);
+                        } else {
+                            $rightArabicName = $rightSurahName;
+                        }
 
                         $pdf->SetFont('times', '', 12);
                         $pdf->Cell(10, 6, ($rightIndex + 1), 1, 0, 'C', true);
@@ -618,7 +614,7 @@ class ReportController extends Controller
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
             }
 
-            if ($juz29Grades) {
+            if ($juz29Grades->count() > 0) {
                 $pdf->SetTextColor(0, 0, 0);
                 $pdf->SetFont('times', '', 12);
 
@@ -634,12 +630,9 @@ class ReportController extends Controller
                 $pdf->Cell(15, 6, 'Angka', 1, 0, 'C');
                 $pdf->Cell(30, 6, 'Keterangan', 1, 1, 'C');
 
-                $juz29Array = [];
-                foreach ($juz29Grades as $grade) {
-                    if ($grade->subject_detail_id) {
-                        $juz29Array[] = $grade;
-                    }
-                }
+                $juz29Array = $juz29Grades->sortBy(function($detail) {
+                    return $detail->tahfidz->id;
+                })->values()->all();
 
                 $totalGrades = count($juz29Array);
                 $halfCount = ceil($totalGrades / 2);
@@ -657,7 +650,7 @@ class ReportController extends Controller
                         $leftGrade = $juz29Array[$i];
                         $leftGradeValue = $leftGrade->grade;
                         $leftGradeInfo = $getGradeInfo($leftGradeValue);
-                        $leftSurahName = $leftGrade->subjectDetail->name ?? '-';
+                        $leftSurahName = $leftGrade->tahfidz->name ?? '-';
 
                         $leftArabicName = preg_match('/^([^\(]+)/', $leftSurahName, $matches)
                             ? trim($matches[1])
@@ -683,11 +676,15 @@ class ReportController extends Controller
                         $rightGrade = $juz29Array[$rightIndex];
                         $rightGradeValue = $rightGrade->grade;
                         $rightGradeInfo = $getGradeInfo($rightGradeValue);
-                        $rightSurahName = $rightGrade->subjectDetail->name ?? '-';
+                        $rightSurahName = $rightGrade->tahfidz->name ?? '-';
 
-                        $rightArabicName = preg_match('/^([^\(]+)/', $rightSurahName, $matches)
-                            ? trim($matches[1])
-                            : $rightSurahName;
+                        if ($rightGrade->tahfidz->arabic_name) {
+                            $rightArabicName = $rightGrade->tahfidz->arabic_name;
+                        } elseif (preg_match('/^([^\(]+)/', $rightSurahName, $matches)) {
+                            $rightArabicName = trim($matches[1]);
+                        } else {
+                            $rightArabicName = $rightSurahName;
+                        }
 
                         $pdf->Cell(10, 6, ($rightIndex + 1), 1, 0, 'C');
                         $pdf->SetFont('freeserif', '', 12);
@@ -729,26 +726,7 @@ class ReportController extends Controller
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
             }
 
-            // Tampilkan bagian "Obyek Penilaian Per Juz" jika ada other grades
             if ($otherGrades->count() > 0) {
-                $allOtherDetailGrades = collect();
-                $allOtherMainGrades = collect();
-
-                foreach ($otherGrades as $subjectId => $grades) {
-                    $mainGrade = $grades->where('subject_detail_id', null)->first();
-                    if ($mainGrade) {
-                        $allOtherMainGrades->push($mainGrade);
-                    }
-
-                    $detailGrades = $grades->where('subject_detail_id', '!=', null);
-                    $allOtherDetailGrades = $allOtherDetailGrades->merge($detailGrades);
-                }
-
-                $totalOtherGrades = $allOtherMainGrades->sum('grade');
-                $averageOtherGrades = $allOtherMainGrades->count() > 0
-                    ? round($totalOtherGrades / $allOtherMainGrades->count(), 1)
-                    : 0;
-
                 $startY = $pdf->GetY();
 
                 $pdf->SetTextColor(0, 0, 0);
@@ -774,18 +752,28 @@ class ReportController extends Controller
                     return ['Kurang', [255, 182, 193]];
                 };
 
-                $pdf->SetFont('freeserif', '', 12);
-                foreach ($otherGrades as $subjectId => $grades) {
-                    $subject = $grades->first()->subject;
-                    $mainGrade = $grades->where('subject_detail_id', null)->first();
-                    $gradeInfo = $getGradeInfo($mainGrade ? $mainGrade->grade : 0);
+                $totalOtherGrades = 0;
+                $countOtherGrades = 0;
 
-                    $pdf->SetFont('freeserif', '', 12);
-                    $pdf->Cell(90, 7, strtoupper($subject->name), 1, 0, 'L');
-                    $pdf->SetFont('times', '', 12);
-                    $pdf->Cell(45, 7, $mainGrade ? $mainGrade->grade : '-', 1, 0, 'C');
+                $pdf->SetFont('times', '', 12);
+                foreach ($otherGrades as $juzNumber => $grades) {
+                    $juzTotal = $grades->sum('grade');
+                    $juzCount = $grades->count();
+                    $juzAverage = $juzCount > 0 ? round($juzTotal / $juzCount, 1) : 0;
+
+                    $totalOtherGrades += $juzTotal;
+                    $countOtherGrades += $juzCount;
+
+                    $gradeInfo = $getGradeInfo($juzAverage);
+
+                    $pdf->Cell(90, 7, 'Juz ' . $juzNumber, 1, 0, 'L');
+                    $pdf->Cell(45, 7, $juzAverage, 1, 0, 'C');
                     $pdf->Cell(45, 7, $gradeInfo[0], 1, 1, 'C');
                 }
+
+                $averageOtherGrades = $countOtherGrades > 0
+                    ? round($totalOtherGrades / $countOtherGrades, 1)
+                    : 0;
 
                 $pdf->SetFillColor(0, 0, 0);
                 $pdf->Cell(90, 6, '', 1, 0, 'C', true);
@@ -808,12 +796,10 @@ class ReportController extends Controller
                 $pdf->Cell(45, 6, '', 1, 1, 'C', true);
             }
 
-            // Hitung total nilai dari semua grades tahfidz
-            $totalTahfidzScore = $tahfidzGrades->sum('grade');
-            $totalTahfidzGrades = $tahfidzGrades->count();
+            $totalTahfidzScore = $tahfidzDetails->sum('grade');
+            $totalTahfidzGrades = $tahfidzDetails->count();
             $averageTahfidzScore = $totalTahfidzGrades > 0 ? round($totalTahfidzScore / $totalTahfidzGrades, 1) : 0;
 
-            // Total Nilai Keseluruhan dan Absensi (selalu ditampilkan)
             $pdf->SetFillColor(255, 255, 255);
             $pdf->SetFont('times', 'B', 12);
             $pdf->Cell(90, 7, 'Total Nilai Keseluruhan', 1, 0, 'L', true);
