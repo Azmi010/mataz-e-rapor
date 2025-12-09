@@ -151,8 +151,8 @@ class ReportController extends Controller
         $pdf->AddPage();
 
         // KOP SURAT - Logo kiri dan kanan
-        $pdf->Image(public_path('img/logo.png'), 15, 10, 25, 25);
-        $pdf->Image(public_path('img/logo.png'), 170, 10, 25, 25);
+        $pdf->Image(public_path('img/logo-yayasan.png'), 13, 8, 30, 30);
+        $pdf->Image(public_path('img/logo-mi.png'), 170, 10, 25, 25);
 
         // Judul Kop
         $pdf->SetFont('algerian', 'B', 20);
