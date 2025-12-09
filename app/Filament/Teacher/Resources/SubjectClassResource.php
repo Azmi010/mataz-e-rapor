@@ -4,11 +4,8 @@ namespace App\Filament\Teacher\Resources;
 
 use App\Filament\Teacher\Resources\SubjectClassResource\Pages;
 use App\Models\Student;
-use App\Models\Subject;
 use App\Models\Semester;
 use App\Models\ReportCard;
-use App\Models\ReportCardGrade;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -40,24 +37,14 @@ class SubjectClassResource extends Resource
                     ->formatStateUsing(fn (string $state): string => $state === 'L' ? 'L' : 'P'),
                 TextColumn::make('score')
                     ->label('Nilai')
-                    ->state(function (Student $record) {
-                        $subjectId = request()->route('subject');
+                    ->getStateUsing(function (Student $record) {
+                        $reportCard = $record->reportCards->first();
 
-                        $semester = Semester::whereDate('start_date', '<=', now())
-                            ->whereDate('end_date', '>=', now())
-                            ->first();
+                        if (!$reportCard) {
+                            return '-';
+                        }
 
-                        if (!$semester) return '-';
-
-                        $reportCard = ReportCard::where('student_id', $record->id)
-                            ->where('semester_id', $semester->id)
-                            ->first();
-
-                        if (!$reportCard) return '-';
-
-                        $grade = ReportCardGrade::where('report_card_id', $reportCard->id)
-                            ->where('subject_id', $subjectId)
-                            ->first();
+                        $grade = $reportCard->grades->first();
 
                         return $grade?->grade ?? '-';
                     })
@@ -93,22 +80,6 @@ class SubjectClassResource extends Resource
                         }
 
                         return $tooltip;
-                    }),
-            ])
-            ->recordActions([
-                Action::make('input_nilai_tahfidz')
-                    ->label('Input Nilai')
-                    ->icon('heroicon-o-pencil-square')
-                    ->color('primary')
-                    ->url(fn (Student $record): string => static::getUrl('tahfidz-grades', [
-                        'subject' => request()->route('subject'),
-                        'class' => request()->route('class'),
-                        'student' => $record->id,
-                    ]))
-                    ->visible(function () {
-                        $subjectId = request()->route('subject');
-                        $subject = Subject::find($subjectId);
-                        return $subject && (stripos($subject->name, 'tahfidz') !== false || stripos($subject->name, 'tahfiz') !== false);
                     }),
             ])
             ->defaultSort('nisn', 'asc');

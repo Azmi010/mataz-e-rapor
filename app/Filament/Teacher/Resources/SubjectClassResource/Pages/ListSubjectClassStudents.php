@@ -15,6 +15,7 @@ use Filament\Notifications\Notification;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListSubjectClassStudents extends ListRecords
@@ -58,14 +59,37 @@ class ListSubjectClassStudents extends ListRecords
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
                 ->modalHeading('Input Nilai Siswa')
+                ->modalDescription('Kosongkan field untuk tidak mengubah nilai yang sudah ada')
                 ->modalWidth('3xl')
+                ->modalSubmitActionLabel('Simpan Nilai')
                 ->form(fn () => $this->getRegularGradeForm())
                 ->action(fn (array $data) => $this->saveRegularGrades($data))
-                ->successRedirectUrl(fn () => static::getUrl([
-                    'subject' => $this->subjectId,
-                    'class' => $this->classId,
-                ])),
+                ->after(fn () => $this->refreshKey++),
         ];
+    }
+
+    public function table(Table $table): Table
+    {
+        $subject = Subject::find($this->subjectId);
+        $isTahfidz = $this->isTahfidzSubject($subject);
+
+        $table = parent::table($table);
+
+        if ($isTahfidz) {
+            $table->recordActions([
+                Action::make('input_nilai_tahfidz')
+                    ->label('Input Nilai')
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('primary')
+                    ->url(fn (Student $record): string => SubjectClassResource::getUrl('tahfidz-grades', [
+                        'subject' => $this->subjectId,
+                        'class' => $this->classId,
+                        'student' => $record->id,
+                    ])),
+            ]);
+        }
+
+        return $table;
     }
 
     public function getBreadcrumbs(): array
@@ -87,8 +111,23 @@ class ListSubjectClassStudents extends ListRecords
 
     protected function getTableQuery(): ?Builder
     {
-        return parent::getTableQuery()
+        $semester = Semester::whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->first();
+
+        $query = parent::getTableQuery()
             ->where('class_id', $this->classId);
+
+        if ($semester) {
+            $query->with(['reportCards' => function ($q) use ($semester) {
+                $q->where('semester_id', $semester->id)
+                  ->with(['grades' => function ($gq) {
+                      $gq->where('subject_id', $this->subjectId);
+                  }]);
+            }]);
+        }
+
+        return $query;
     }
 
     protected function isTahfidzSubject($subject): bool
@@ -133,7 +172,8 @@ class ListSubjectClassStudents extends ListRecords
                 ->minValue(0)
                 ->maxValue(100)
                 ->default($currentScore)
-                ->placeholder('Masukkan nilai (0-100)');
+                ->placeholder($currentScore !== null ? "Nilai saat ini: {$currentScore}" : 'Masukkan nilai (0-100)')
+                ->helperText($currentScore !== null ? "Kosongkan untuk tidak mengubah" : null);
         }
 
         return $fields;
@@ -222,8 +262,15 @@ class ListSubjectClassStudents extends ListRecords
         }
 
         $savedCount = 0;
+        $hasData = false;
+
         foreach ($data as $key => $value) {
-            if (strpos($key, 'score_') === 0 && $value !== null && $value !== '') {
+            if (strpos($key, 'score_') === 0) {
+                if ($value === null || $value === '') {
+                    continue;
+                }
+
+                $hasData = true;
                 $studentId = str_replace('score_', '', $key);
 
                 $reportCard = ReportCard::firstOrCreate([
@@ -243,6 +290,15 @@ class ListSubjectClassStudents extends ListRecords
 
                 $savedCount++;
             }
+        }
+
+        if (!$hasData) {
+            Notification::make()
+                ->warning()
+                ->title('Tidak ada perubahan')
+                ->body('Tidak ada nilai yang diinput.')
+                ->send();
+            return;
         }
 
         Notification::make()

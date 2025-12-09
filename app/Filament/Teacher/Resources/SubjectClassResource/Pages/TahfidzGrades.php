@@ -94,7 +94,14 @@ class TahfidzGrades extends Page implements HasTable
                         $this->updateGrade($record, $state);
                     })
                     ->getStateUsing(function (Model $record) {
-                        return $this->getCurrentGrade($record);
+                        static $cache = [];
+                        $cacheKey = $record->id . '-' . $this->studentId;
+
+                        if (!isset($cache[$cacheKey])) {
+                            $cache[$cacheKey] = $this->getCurrentGrade($record);
+                        }
+
+                        return $cache[$cacheKey];
                     }),
             ])
             ->filters([
@@ -173,6 +180,8 @@ class TahfidzGrades extends Page implements HasTable
         }
 
         $this->updateAverageGrade($reportCard);
+
+        $this->dispatch('$refresh');
 
         Notification::make()
             ->success()
