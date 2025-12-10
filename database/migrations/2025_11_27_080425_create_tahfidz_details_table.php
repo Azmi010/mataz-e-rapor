@@ -14,9 +14,7 @@ return new class extends Migration
         Schema::create('tahfidz_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('report_card_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->string('surah')->nullable();
-            $table->string('ayat')->nullable();
+            $table->foreignId('tahfidz_id')->constrained('tahfidz')->onDelete('cascade');
             $table->integer('grade')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();

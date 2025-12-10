@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->nullable()->constrained('subject_categories')->onDelete('cascade');
             $table->string('name');
             $table->string('description')->nullable();
-            $table->boolean('has_details')->default(false);
             $table->timestamps();
         });
     }

@@ -15,40 +15,16 @@ class SubjectCategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Pendidikan Agama Islam',
+                'name' => 'Mapel Agama',
                 'description' => 'Mata pelajaran yang berkaitan dengan pendidikan agama Islam'
             ],
             [
-                'name' => 'Tahfidz Al-Quran',
-                'description' => 'Mata pelajaran tahfidz dan hafalan Al-Quran'
-            ],
-            [
-                'name' => 'Bahasa',
-                'description' => 'Mata pelajaran bahasa Indonesia, Arab, dan Inggris'
-            ],
-            [
-                'name' => 'Matematika',
-                'description' => 'Mata pelajaran matematika dan ilmu hitung'
-            ],
-            [
-                'name' => 'Ilmu Pengetahuan Alam',
-                'description' => 'Mata pelajaran IPA, Biologi, Fisika, Kimia'
-            ],
-            [
-                'name' => 'Ilmu Pengetahuan Sosial',
-                'description' => 'Mata pelajaran IPS, Sejarah, Geografi'
-            ],
-            [
-                'name' => 'Seni dan Budaya',
-                'description' => 'Mata pelajaran seni, musik, dan budaya'
-            ],
-            [
-                'name' => 'Pendidikan Jasmani',
-                'description' => 'Mata pelajaran olahraga dan kesehatan'
+                'name' => 'Mapel Umum',
+                'description' => 'Mata pelajaran umum'
             ],
             [
                 'name' => 'Muatan Lokal',
-                'description' => 'Mata pelajaran muatan lokal dan keterampilan'
+                'description' => 'Mata pelajaran muatan lokal'
             ],
         ];
 

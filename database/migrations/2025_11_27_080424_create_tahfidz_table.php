@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('arabic_name')->nullable()->comment('Nama Arab');
             $table->text('description')->nullable();
             $table->integer('juz')->nullable()->comment('Nomor Juz');
-            $table->string('ayat_range')->nullable()->comment('Range ayat, contoh: 1-7');
-            $table->integer('order')->default(1)->comment('Urutan');
             $table->timestamps();
         });
     }

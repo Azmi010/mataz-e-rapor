@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('semester_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->enum('level', ['Kecamatan', 'Kabupaten', 'Provinsi', 'Nasional', 'Internasional']);
+            $table->date('date');
             $table->text('description')->nullable();
             $table->timestamps();
         });
