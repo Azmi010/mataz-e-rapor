@@ -53,7 +53,7 @@ class RecentAchievements extends TableWidget
                     ->badge()
                     ->color('primary'),
 
-                TextColumn::make('achievement_name')
+                TextColumn::make('name')
                     ->label('Prestasi')
                     ->searchable()
                     ->wrap(),

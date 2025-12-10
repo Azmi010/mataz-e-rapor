@@ -14,7 +14,13 @@ class Achievement extends Model
         'student_id',
         'semester_id',
         'name',
+        'level',
+        'date',
         'description',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
     ];
 
     public function student(): BelongsTo

@@ -131,6 +131,8 @@ class HomeroomAchievements extends Page implements HasTable
                                     if ($state) {
                                         $achievement = Achievement::find($state);
                                         $set('name', $achievement->name);
+                                        $set('level', $achievement->level);
+                                        $set('date', $achievement->date);
                                         $set('description', $achievement->description);
                                         $livewire->selectedAchievementId = $state;
                                     }
@@ -139,6 +141,20 @@ class HomeroomAchievements extends Page implements HasTable
                                 ->label('Nama Prestasi')
                                 ->required()
                                 ->maxLength(255),
+                            Select::make('level')
+                                ->label('Tingkat')
+                                ->options([
+                                    'Kecamatan' => 'Kecamatan',
+                                    'Kabupaten' => 'Kabupaten',
+                                    'Provinsi' => 'Provinsi',
+                                    'Nasional' => 'Nasional',
+                                    'Internasional' => 'Internasional',
+                                ])
+                                ->required(),
+                            \Filament\Forms\Components\DatePicker::make('date')
+                                ->label('Tanggal')
+                                ->required()
+                                ->maxDate(now()),
                             Textarea::make('description')
                                 ->label('Deskripsi')
                                 ->rows(3)
@@ -151,6 +167,8 @@ class HomeroomAchievements extends Page implements HasTable
                         if ($achievement) {
                             $achievement->update([
                                 'name' => $data['name'],
+                                'level' => $data['level'],
+                                'date' => $data['date'],
                                 'description' => $data['description'] ?? null,
                             ]);
 
@@ -219,6 +237,20 @@ class HomeroomAchievements extends Page implements HasTable
                         ->label('Nama Prestasi')
                         ->required()
                         ->maxLength(255),
+                    Select::make('level')
+                        ->label('Tingkat')
+                        ->options([
+                            'Kecamatan' => 'Kecamatan',
+                            'Kabupaten' => 'Kabupaten',
+                            'Provinsi' => 'Provinsi',
+                            'Nasional' => 'Nasional',
+                            'Internasional' => 'Internasional',
+                        ])
+                        ->required(),
+                    \Filament\Forms\Components\DatePicker::make('date')
+                        ->label('Tanggal')
+                        ->required()
+                        ->maxDate(now()),
                     Textarea::make('description')
                         ->label('Deskripsi')
                         ->rows(3)
@@ -229,6 +261,8 @@ class HomeroomAchievements extends Page implements HasTable
                         'student_id' => $data['student_id'],
                         'semester_id' => $semester->id,
                         'name' => $data['name'],
+                        'level' => $data['level'],
+                        'date' => $data['date'],
                         'description' => $data['description'] ?? null,
                     ]);
                 })
