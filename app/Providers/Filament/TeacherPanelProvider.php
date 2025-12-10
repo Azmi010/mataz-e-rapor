@@ -161,8 +161,9 @@ class TeacherPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\Filament\Teacher\Widgets')
             ->widgets([
                 \App\Filament\Teacher\Widgets\TeacherStatsOverview::class,
-                \App\Filament\Teacher\Widgets\UpcomingActivities::class,
-                \App\Filament\Teacher\Widgets\RecentStudents::class,
+                \App\Filament\Teacher\Widgets\AttendanceChart::class,
+                \App\Filament\Teacher\Widgets\RecentAchievements::class,
+                \App\Filament\Teacher\Widgets\TeacherInfoWidget::class,
             ])
             ->darkMode(true)
             ->darkModeBrandLogo(fn () => view('filament.brand'))
