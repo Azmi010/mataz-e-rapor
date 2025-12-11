@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ClassModels\Schemas;
 
+use App\Models\Teacher;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -23,6 +24,17 @@ class ClassModelForm
                     ->required()
                     ->preload()
                     ->helperText('Hanya tahun akademik yang aktif yang bisa dipilih'),
+                Select::make('homeroom_teacher_id')
+                    ->label('Wali Kelas')
+                    ->options(function () {
+                        return Teacher::with('user')
+                            ->whereHas('user', fn($query) => $query->where('role', 'teacher'))
+                            ->get()
+                            ->pluck('user.name', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Pilih guru yang menjadi wali kelas'),
                 Select::make('subjects')
                     ->label('Mata Pelajaran')
                     ->relationship('subjects', 'name')

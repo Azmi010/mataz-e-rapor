@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RecapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +12,7 @@ Route::get('/', function () {
             'admin' => redirect('/admin'),
             'teacher' => redirect('/teacher'),
             'student' => redirect('/student'),
-            default => redirect('/auth/login'),
+            default => redirect('/login'),
         };
     }
     return view('welcome');
@@ -24,3 +24,8 @@ Route::get('/dashboard', function () {
 
 Route::get('/teacher/grading/{student}/rapor-pdf', [ReportController::class, 'generateReport'])
     ->name('rapor.pdf');
+
+Route::get('/teacher/grading/{student}/rekap-pdf', [RecapController::class, 'generateRecap'])
+    ->name('rekap.pdf');
+
+Route::redirect('/auth/login', '/login')->name('login');

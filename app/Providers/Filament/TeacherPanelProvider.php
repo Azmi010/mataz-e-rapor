@@ -6,6 +6,12 @@ use App\Filament\Teacher\Pages\DailyActivityChecklist;
 use App\Filament\Teacher\Pages\GradeManagement;
 use App\Filament\Teacher\Resources\DailyActivities\DailyActivityResource;
 use App\Http\Middleware\RoleRedirectMiddleware;
+use App\Models\Teacher;
+use App\Models\ClassModel;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Filament\Navigation\NavigationItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -67,13 +73,97 @@ class TeacherPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
                 GradeManagement::class,
-                // GradingForm::class - Tidak didaftarkan karena butuh parameter
             ])
+            ->navigation(function (\Filament\Navigation\NavigationBuilder $builder): \Filament\Navigation\NavigationBuilder {
+                $builder->items([
+                    NavigationItem::make('Dashboard')
+                        ->icon('heroicon-o-home')
+                        ->activeIcon('heroicon-s-home')
+                        ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.pages.dashboard'))
+                        ->url(fn (): string => Dashboard::getUrl()),
+                ]);
+
+                if (Auth::check()) {
+                    $teacher = Teacher::where('user_id', Auth::id())->first();
+
+                    if ($teacher) {
+                        $subjectsWithClasses = DB::table('class_subjects')
+                            ->join('subjects', 'class_subjects.subject_id', '=', 'subjects.id')
+                            ->join('class_models', 'class_subjects.class_model_id', '=', 'class_models.id')
+                            ->where('class_subjects.teacher_id', $teacher->id)
+                            ->select(
+                                'subjects.id as subject_id',
+                                'subjects.name as subject_name',
+                                'class_models.id as class_id',
+                                'class_models.name as class_name'
+                            )
+                            ->orderBy('subjects.name')
+                            ->orderBy('class_models.name')
+                            ->get()
+                            ->groupBy('subject_id');
+
+                        $groups = [];
+                        foreach ($subjectsWithClasses as $subjectId => $classes) {
+                            $subjectName = $classes->first()->subject_name;
+
+                            $groupItems = [];
+                            foreach ($classes as $class) {
+                                $groupItems[] = NavigationItem::make($class->class_name)
+                                    ->url(route('filament.teacher.resources.subject-classes.index', [
+                                        'subject' => $subjectId,
+                                        'class' => $class->class_id,
+                                    ]))
+                                    ->isActiveWhen(function () use ($subjectId, $class) {
+                                        return request()->route('subject') == $subjectId
+                                            && request()->route('class') == $class->class_id;
+                                    });
+                            }
+
+                            $groups[] = NavigationGroup::make($subjectName)
+                                ->items($groupItems)
+                                ->icon('heroicon-o-book-open')
+                                ->collapsible();
+                        }
+
+                        $homeroomClass = ClassModel::where('homeroom_teacher_id', $teacher->id)->first();
+
+                        if ($homeroomClass) {
+                            $homeroomItems = [
+                                NavigationItem::make('Data Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.students'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.students')),
+                                NavigationItem::make('Absen Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.attendance'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.attendance')),
+                                NavigationItem::make('Catatan Wali Kelas')
+                                    ->url(route('filament.teacher.resources.homeroom.notes'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.notes')),
+                                NavigationItem::make('Prestasi')
+                                    ->url(route('filament.teacher.resources.homeroom.achievements'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.achievements')),
+                                NavigationItem::make('Rapor Siswa')
+                                    ->url(route('filament.teacher.resources.homeroom.reports'))
+                                    ->isActiveWhen(fn (): bool => request()->routeIs('filament.teacher.resources.homeroom.reports')),
+                            ];
+
+                            $groups[] = NavigationGroup::make('Wali Kelas')
+                                ->items($homeroomItems)
+                                ->icon('heroicon-o-user-group')
+                                ->collapsible();
+                        }
+
+                        $builder->groups($groups);
+                    }
+                }
+
+                return $builder;
+            })
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\Filament\Teacher\Widgets')
             ->widgets([
                 \App\Filament\Teacher\Widgets\TeacherStatsOverview::class,
-                \App\Filament\Teacher\Widgets\UpcomingActivities::class,
-                \App\Filament\Teacher\Widgets\RecentStudents::class,
+                \App\Filament\Teacher\Widgets\AttendanceChart::class,
+                \App\Filament\Teacher\Widgets\RecentAchievements::class,
+                \App\Filament\Teacher\Widgets\TeacherInfoWidget::class,
             ])
             ->darkMode(true)
             ->darkModeBrandLogo(fn () => view('filament.brand'))
@@ -94,4 +184,5 @@ class TeacherPanelProvider extends PanelProvider
                 RoleRedirectMiddleware::class,
             ]);
     }
+
 }

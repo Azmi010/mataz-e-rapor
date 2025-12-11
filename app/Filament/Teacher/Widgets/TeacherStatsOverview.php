@@ -6,57 +6,55 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use App\Models\Student;
 use App\Models\ClassModel;
-use App\Models\DailyActivity;
-use App\Models\Attendance;
-use App\Models\AcademicYear;
+use App\Models\Teacher;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TeacherStatsOverview extends BaseWidget
 {
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
 
     protected function getStats(): array
     {
-        $activeYear = AcademicYear::where('status', true)->first();
-        
-        // Total siswa
-        $totalStudents = Student::count();
-        
-        // Total kelas
-        $totalClasses = ClassModel::count();
-        
-        // Kehadiran hari ini
-        $todayAttendance = Attendance::whereDate('date', today())->count();
-        
-        // Aktivitas hari ini
-        $todayActivities = DailyActivity::whereDate('activity_date', today())->count();
+        $teacher = Teacher::where('user_id', Auth::id())->first();
 
-        return [
-            Stat::make('Total Siswa', $totalStudents)
-                ->description('Siswa terdaftar')
+        if (!$teacher) {
+            return [];
+        }
+
+        $classesTeaching = DB::table('class_subjects')
+            ->where('teacher_id', $teacher->id)
+            ->distinct('class_model_id')
+            ->pluck('class_model_id');
+
+        $totalClassesTeaching = $classesTeaching->count();
+
+        $totalStudentsTeaching = Student::whereIn('class_id', $classesTeaching)->count();
+
+        $homeroomClass = ClassModel::where('homeroom_teacher_id', $teacher->id)->first();
+
+        $stats = [
+            Stat::make('Siswa yang Diajar', $totalStudentsTeaching)
+                ->description('Total siswa di kelas yang diampu')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success')
-                ->chart([5, 10, 15, 20, 25, $totalStudents]),
+                ->chart([10, 15, 20, 25, 30, $totalStudentsTeaching]),
 
-            Stat::make('Total Kelas', $totalClasses)
-                ->description('Kelas aktif')
-                ->descriptionIcon('heroicon-m-building-office-2')
-                ->color('primary')
-                ->chart([1, 2, 3, 4, $totalClasses]),
-
-            Stat::make('Kehadiran Hari Ini', $todayAttendance)
-                ->description('Siswa yang sudah diabsen')
-                ->descriptionIcon('heroicon-m-check-circle')
-                ->color('info'),
-
-            Stat::make('Aktivitas Hari Ini', $todayActivities)
-                ->description('Aktivitas yang tercatat')
-                ->descriptionIcon('heroicon-m-clipboard-document-check')
-                ->color('warning'),
-
-            Stat::make('Tahun Ajaran', $activeYear ? $activeYear->name : 'Tidak Ada')
-                ->description($activeYear ? 'Tahun ajaran aktif' : 'Belum ada tahun ajaran aktif')
-                ->descriptionIcon('heroicon-m-calendar')
-                ->color($activeYear ? 'success' : 'danger'),
+            Stat::make('Kelas yang Diajar', $totalClassesTeaching)
+                ->description('Kelas yang diampu')
+                ->descriptionIcon('heroicon-m-academic-cap')
+                ->color('primary'),
         ];
+
+        if ($homeroomClass) {
+            $homeroomStudentsCount = Student::where('class_id', $homeroomClass->id)->count();
+
+            $stats[] = Stat::make('Wali Kelas', $homeroomClass->name)
+                ->description($homeroomStudentsCount . ' siswa dalam kelas')
+                ->descriptionIcon('heroicon-m-home')
+                ->color('warning');
+        }
+
+        return $stats;
     }
 }

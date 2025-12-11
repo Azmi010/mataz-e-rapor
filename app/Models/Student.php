@@ -17,9 +17,35 @@ class Student extends Model
         'user_id',
         'class_id',
         'nis',
+        'nisn',
+        'gender',
+        'birth_place',
+        'birth_date',
+        'religion',
+        'family_status',
+        'child_order',
+        'previous_school',
+        'accepted_date',
+        'accepted_in_class',
+        'father_name',
+        'mother_name',
+        'father_occupation',
+        'father_occupation_other',
+        'mother_occupation',
+        'mother_occupation_other',
+        'parent_address',
+        'guardian_name',
+        'guardian_occupation',
+        'guardian_occupation_other',
+        'guardian_address',
         'wali',
         'phone',
         'address',
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'accepted_date' => 'date',
     ];
 
     public function user(): BelongsTo
@@ -45,5 +71,10 @@ class Student extends Model
     public function reportCards(): HasMany
     {
         return $this->hasMany(ReportCard::class);
+    }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(Achievement::class);
     }
 }

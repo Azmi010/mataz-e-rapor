@@ -19,27 +19,20 @@ class SubjectsTable
                 TextColumn::make('name')
                     ->label('Nama Mata Pelajaran')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('semibold'),
+
+                TextColumn::make('category.name')
+                    ->label('Kategori')
+                    ->sortable()
+                    ->default('-')
+                    ->badge()
+                    ->color('info'),
 
                 TextColumn::make('description')
                     ->label('Deskripsi')
                     ->limit(50)
                     ->toggleable(),
-
-                IconColumn::make('has_details')
-                    ->label('Memiliki Detail')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('gray'),
-
-                TextColumn::make('details_count')
-                    ->label('Jumlah Detail')
-                    ->counts('details')
-                    ->badge()
-                    ->color('info')
-                    ->visible(fn($record) => $record?->has_details),
 
                 TextColumn::make('classModels')
                     ->label('Digunakan di Kelas')

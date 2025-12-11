@@ -28,6 +28,11 @@ class ReportCard extends Model
         return $this->hasMany(ReportCardGrade::class);
     }
 
+    public function tahfidzDetails(): HasMany
+    {
+        return $this->hasMany(TahfidzDetail::class);
+    }
+
     public function getAttendanceArrayAttribute(): array
     {
         if (!$this->attendance) return [];

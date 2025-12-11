@@ -16,12 +16,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             AcademicYearSeeder::class,
-            QuranJuzSeeder::class,
-            StudentSeeder::class,
-            TeacherSeeder::class,
             ActivitySeeder::class,
             ClassModelSeeder::class,
-            AttendanceSeeder::class,
+            SubjectCategorySeeder::class,
+            SubjectSeeder::class,
+            TahfidzSeeder::class,
         ]);
     }
 }
