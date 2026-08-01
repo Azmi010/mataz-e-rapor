@@ -1,5 +1,0 @@
-saya sudah mau production, tapi masih mau memperbaiki beberapa hal:
-1. hapus breeze, karena masih ada breeze nya
-2. saya ingin pintu masuk loginnya jadi satu saja pakai filament, kalau sekarang kan harus /admin/login atau /teacher/login, nah saya ingin /login saja, jadi 1 pintu masuk
-3. sesuaikan base warna website nya dengan warna logo di logo.png, disitu bisa dilihat dominan warnanya apa
-4. tambahkan di welcome.blade.php sebuah tampilan untuk company profile website markaz tahfidz el-zahroh (mataz) yang merupakan sekolah tahfidz anak plus coding anak juga
